@@ -159,28 +159,28 @@ const Workspace: React.FC = () => {
 
         <div className="bg-surface rounded-2xl overflow-hidden border border-white shadow-xl shadow-blue-900/5">
           <table className="w-full text-left">
-            <thead className="bg-[#0B3C88] text-white shadow-sm">
+             <thead className="bg-[#0B3C88] text-white shadow-sm">
               <tr>
-                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Publication Name</th>
-                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Uploaded By</th>
-                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Audience</th>
-                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Asset Type</th>
-                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Action</th>
+                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs w-full">Publication Name</th>
+                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs whitespace-nowrap">Uploaded By</th>
+                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs whitespace-nowrap">Audience</th>
+                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs whitespace-nowrap">Asset Type</th>
+                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs whitespace-nowrap">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {assets.map((asset) => (
                 <tr key={asset.generation_id} className="hover:bg-blue-50/50 transition-colors group">
                   <td className="px-6 py-5 text-text font-medium">{asset.publication_title}</td>
-                  <td className="px-6 py-5">
+                  <td className="px-6 py-5 whitespace-nowrap">
                     <span className="text-sm font-semibold text-text flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs">{asset.uploaded_by ? asset.uploaded_by.charAt(0).toUpperCase() : '?'}</div>
                       {asset.uploaded_by}
                     </span>
                   </td>
-                  <td className="px-6 py-5"><span className="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold tracking-wide">{asset.audience_level}</span></td>
-                  <td className="px-6 py-5"><span className="px-3 py-1.5 bg-cyan-50 text-cyan-700 rounded-full text-xs font-bold tracking-wide">{asset.asset_type}</span></td>
-                  <td className="px-6 py-5">
+                  <td className="px-6 py-5 whitespace-nowrap"><span className="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold tracking-wide">{asset.audience_level}</span></td>
+                  <td className="px-6 py-5 whitespace-nowrap"><span className="px-3 py-1.5 bg-cyan-50 text-cyan-700 rounded-full text-xs font-bold tracking-wide">{asset.asset_type}</span></td>
+                  <td className="px-6 py-5 whitespace-nowrap">
                     <div className="flex gap-3">
                       <button 
                         onClick={() => navigate(`/review/${asset.generation_id}`)}
