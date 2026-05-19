@@ -118,15 +118,27 @@ const StudioView: React.FC = () => {
           <img src={url} alt="Generated Asset" className="max-w-full max-h-full object-contain" />
         </div>
       );
+    } else if (lowerUrl.endsWith('.pdf')) {
+      return (
+        <iframe 
+          src={url} 
+          className="w-full h-full border-0"
+          title="Asset Preview"
+        />
+      );
     } else {
-      // For PPT or other unrenderable files natively, provide a Google Docs Viewer iframe + separate buttons
-      const googleDocsViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
+      // Use Microsoft Office Viewer for Office files, fallback to Google Docs for others
+      let viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
+      
+      if (lowerUrl.match(/\.(ppt|pptx|doc|docx|xls|xlsx)$/)) {
+        viewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
+      }
       
       return (
         <div className="flex flex-col h-full bg-surface text-text" ref={iframeContainerRef}>
           <div className="flex-1 relative w-full bg-white">
             <iframe 
-              src={googleDocsViewerUrl}
+              src={viewerUrl}
               className="w-full h-full border-0 absolute top-0 left-0"
               title="Asset Preview"
             />

@@ -165,7 +165,7 @@ const Workspace: React.FC = () => {
                 <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Uploaded By</th>
                 <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Audience</th>
                 <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Asset Type</th>
-                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs text-right">Action</th>
+                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -180,8 +180,8 @@ const Workspace: React.FC = () => {
                   </td>
                   <td className="px-6 py-5"><span className="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold tracking-wide">{asset.audience_level}</span></td>
                   <td className="px-6 py-5"><span className="px-3 py-1.5 bg-cyan-50 text-cyan-700 rounded-full text-xs font-bold tracking-wide">{asset.asset_type}</span></td>
-                  <td className="px-6 py-5 text-right">
-                    <div className="flex justify-end gap-3">
+                  <td className="px-6 py-5">
+                    <div className="flex gap-3">
                       <button 
                         onClick={() => navigate(`/review/${asset.generation_id}`)}
                         className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary text-white px-5 py-2 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-200 font-semibold"
