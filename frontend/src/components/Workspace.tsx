@@ -90,7 +90,7 @@ const Workspace: React.FC = () => {
     <div className="min-h-screen bg-background text-text p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-text">Review & Hub Workspace</h1>
+          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#0B3C88] to-[#00B5FF] tracking-tight">Review & Hub Workspace</h1>
           <div className="flex gap-4">
             {(user?.role === 'admin' || user?.role === 'creator') && (
               <button 
@@ -159,7 +159,7 @@ const Workspace: React.FC = () => {
 
         <div className="bg-surface rounded-2xl overflow-hidden border border-white shadow-xl shadow-blue-900/5">
           <table className="w-full text-left">
-            <thead className="bg-slate-50/80 border-b border-border text-text">
+            <thead className="bg-[#0B3C88] text-white shadow-sm">
               <tr>
                 <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Publication Name</th>
                 <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Uploaded By</th>
