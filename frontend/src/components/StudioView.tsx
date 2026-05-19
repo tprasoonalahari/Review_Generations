@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Send, X, FileText } from 'lucide-react';
 
 interface Comment {
   id: string;
@@ -34,6 +34,7 @@ const StudioView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const commentsEndRef = useRef<HTMLDivElement>(null);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
+  const [isPdfOpen, setIsPdfOpen] = useState(true);
 
   const fetchData = async () => {
     try {
@@ -173,24 +174,39 @@ const StudioView: React.FC = () => {
             </div>
           </div>
         </div>
+        {!isPdfOpen && (
+          <button 
+            onClick={() => setIsPdfOpen(true)}
+            className="flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-md text-sm font-semibold transition-colors"
+          >
+            <FileText size={18} /> Show Source PDF
+          </button>
+        )}
       </header>
 
       {/* Main Grid Grid */}
       <div className="flex-1 grid grid-cols-12 h-[calc(100vh-4rem)] bg-background">
         {/* Left Panel - PDF Viewer (Col span 5) */}
-        <div className="col-span-5 bg-background flex flex-col h-full p-6">
-          <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted">Source Reference (PDF)</div>
-          <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden">
-            <iframe 
-              src={getFullUrl(data.publication.pdf_url)} 
-              className="w-full h-full border-0"
-              title="PDF Viewer"
-            />
+        {isPdfOpen && (
+          <div className="col-span-5 bg-background flex flex-col h-full p-6">
+            <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted flex justify-between items-center">
+              <span>Source Reference (PDF)</span>
+              <button onClick={() => setIsPdfOpen(false)} className="text-text-muted hover:text-text transition-colors" title="Close PDF Panel">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden">
+              <iframe 
+                src={getFullUrl(data.publication.pdf_url)} 
+                className="w-full h-full border-0"
+                title="PDF Viewer"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Middle Panel - Asset Viewer (Col span 5) */}
-        <div className="col-span-5 bg-background flex flex-col h-full p-6 pl-0">
+        {/* Middle Panel - Asset Viewer */}
+        <div className={`${isPdfOpen ? 'col-span-5' : 'col-span-10'} bg-background flex flex-col h-full p-6 ${isPdfOpen ? 'pl-0' : ''}`}>
           <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted flex justify-between items-center">
             <span>Generated Asset</span>
             <a href={getFullUrl(data.generation.generation_url)} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-hover lowercase font-semibold tracking-normal">Open Original</a>
