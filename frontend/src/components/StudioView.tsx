@@ -86,8 +86,14 @@ const StudioView: React.FC = () => {
     return <div className="h-screen bg-background flex items-center justify-center text-text">Asset not found.</div>;
   }
 
+  const getFullUrl = (path: string) => {
+    if (!path) return '';
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    return `${API_BASE_URL}${path}`;
+  };
+
   const renderAssetPlayer = () => {
-    const url = `${API_BASE_URL}${data.generation.generation_url}`;
+    const url = getFullUrl(data.generation.generation_url);
     const type = data.generation.asset_type;
 
     if (type === 'Video' || url.endsWith('.mp4')) {
@@ -167,7 +173,7 @@ const StudioView: React.FC = () => {
           <div className="px-4 py-2 bg-surface/90 border-b border-border text-sm font-semibold sticky top-0 text-text">Source Reference (PDF)</div>
           <div className="flex-1 p-2 bg-background h-full">
             <iframe 
-              src={`${API_BASE_URL}${data.publication.pdf_url}`} 
+              src={getFullUrl(data.publication.pdf_url)} 
               className="w-full h-full border-0 bg-white rounded"
               title="PDF Viewer"
             />
@@ -178,7 +184,7 @@ const StudioView: React.FC = () => {
         <div className="col-span-5 border-r border-border bg-background flex flex-col h-full">
           <div className="px-4 py-2 bg-surface/90 border-b border-border text-sm font-semibold sticky top-0 flex justify-between items-center text-text">
             <span>Generated Asset</span>
-            <a href={`${API_BASE_URL}${data.generation.generation_url}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-hover text-xs font-semibold">Open Original</a>
+            <a href={getFullUrl(data.generation.generation_url)} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-hover text-xs font-semibold">Open Original</a>
           </div>
           <div className="flex-1 overflow-hidden h-full">
             {renderAssetPlayer()}
