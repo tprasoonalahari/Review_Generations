@@ -201,9 +201,10 @@ const StudioView: React.FC = () => {
         </div>
 
         {/* Right Panel - Comments (Col span 2) */}
-        <div className="col-span-2 bg-white flex flex-col h-full border-l border-border shadow-[-10px_0_15px_-3px_rgba(0,0,0,0.05)] z-10">
-          <div className="px-6 py-5 border-b border-border text-xs font-bold tracking-widest uppercase text-text-muted bg-slate-50/50">Review Comments</div>
-          <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
+        <div className="col-span-2 bg-background flex flex-col h-full p-6 pl-0">
+          <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted">Review Comments</div>
+          <div className="flex-1 bg-white rounded-md shadow-xl border border-border flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
             {data.comments.length === 0 ? (
               <p className="text-text-muted text-sm text-center mt-8 italic">No comments yet. Start the review!</p>
             ) : (
@@ -239,6 +240,7 @@ const StudioView: React.FC = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
