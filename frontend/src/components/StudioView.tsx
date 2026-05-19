@@ -209,7 +209,6 @@ const StudioView: React.FC = () => {
         <div className={`${isPdfOpen ? 'col-span-5' : 'col-span-10'} bg-background flex flex-col h-full p-6 ${isPdfOpen ? 'pl-0' : ''}`}>
           <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted flex justify-between items-center">
             <span>Generated Asset</span>
-            <a href={getFullUrl(data.generation.generation_url)} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-hover lowercase font-semibold tracking-normal">Open Original</a>
           </div>
           <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden">
             {renderAssetPlayer()}
