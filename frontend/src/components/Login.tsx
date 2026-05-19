@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 
 const Login: React.FC = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,6 +17,7 @@ const Login: React.FC = () => {
       const formData = new URLSearchParams();
       formData.append('username', email);
       formData.append('password', password);
+      formData.append('client_id', name); // Using client_id to pass name since it's supported by OAuth2 form
       
       const response = await api.post('/auth/login', formData, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
@@ -36,6 +38,17 @@ const Login: React.FC = () => {
         <h2 className="text-3xl font-extrabold text-center text-text mb-8 tracking-tight">Review & Hub</h2>
         {error && <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-2 rounded mb-4">{error}</div>}
         <form onSubmit={handleLogin}>
+          <div className="mb-5">
+            <label className="block text-text-muted text-sm font-semibold mb-2">Your Name</label>
+            <input 
+              type="text" 
+              className="w-full px-4 py-3 bg-background/50 text-text border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. John Doe"
+              required
+            />
+          </div>
           <div className="mb-5">
             <label className="block text-text-muted text-sm font-semibold mb-2">Email</label>
             <input 

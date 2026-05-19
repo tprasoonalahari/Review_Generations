@@ -8,6 +8,8 @@ from app.database import Base
 import enum
 
 class AudienceLevel(str, enum.Enum):
+    Field_force = 'Field force'
+    MSLs = 'MSLs'
     Doctor = 'Doctor'
     HCP = 'HCP'
     Professional = 'Professional'
@@ -49,6 +51,7 @@ class Generation(Base):
     audience_level = Column(Enum(AudienceLevel), nullable=False)
     asset_type = Column(Enum(AssetType), nullable=False)
     generation_url = Column(Text, nullable=False)
+    uploaded_by = Column(String, default="Unknown")
     created_at = Column(DateTime, default=func.now())
     
     publication = relationship("Publication", back_populates="generations")

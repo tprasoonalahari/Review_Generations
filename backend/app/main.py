@@ -6,8 +6,24 @@ from app.database import engine, Base
 from app.core.config import settings
 import os
 
+from sqlalchemy import text
+
 # Create DB tables
 Base.metadata.create_all(bind=engine)
+
+# Auto-migrate schema changes
+try:
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE generations ADD COLUMN IF NOT EXISTS uploaded_by VARCHAR DEFAULT 'Unknown';"))
+except Exception as e:
+    print(f"Migration error (column might exist): {e}")
+
+try:
+    with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
+        conn.execute(text("ALTER TYPE audiencelevel ADD VALUE IF NOT EXISTS 'Field force';"))
+        conn.execute(text("ALTER TYPE audiencelevel ADD VALUE IF NOT EXISTS 'MSLs';"))
+except Exception as e:
+    print(f"Enum Migration error (values might exist): {e}")
 
 app = FastAPI(title=settings.PROJECT_NAME)
 

@@ -29,6 +29,7 @@ def get_assets(db: Session = Depends(database.get_db), current_user: models.User
                 "audience_level": gen.audience_level,
                 "asset_type": gen.asset_type,
                 "generation_url": gen.generation_url,
+                "uploaded_by": getattr(gen, "uploaded_by", "Unknown"),
                 "created_at": gen.created_at
             })
     return result
@@ -76,7 +77,8 @@ def create_asset(
         publication_id=new_pub.id,
         audience_level=audience_level,
         asset_type=asset_type,
-        generation_url=generation_url
+        generation_url=generation_url,
+        uploaded_by=getattr(current_user, 'current_name', 'Unknown')
     )
     db.add(new_gen)
     db.commit()

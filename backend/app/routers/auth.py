@@ -19,6 +19,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         email: str = payload.get("sub")
+        user_name: str = payload.get("name", "Unknown User")
         if email is None:
             raise credentials_exception
         token_data = schemas.TokenData(email=email)
@@ -27,6 +28,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     user = db.query(models.User).filter(models.User.email == token_data.email).first()
     if user is None:
         raise credentials_exception
+    user.current_name = user_name
     return user
 
 @router.post("/register", response_model=schemas.UserResponse)
@@ -52,7 +54,8 @@ def login_for_access_token(db: Session = Depends(database.get_db), form_data: OA
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = security.timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    user_name = form_data.client_id or "Unknown User"
     access_token = security.create_access_token(
-        data={"sub": user.email, "role": user.role}, expires_delta=access_token_expires
+        data={"sub": user.email, "role": user.role, "name": user_name}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}

@@ -10,6 +10,7 @@ interface Asset {
   generation_id: string;
   audience_level: string;
   asset_type: string;
+  uploaded_by: string;
 }
 
 const Workspace: React.FC = () => {
@@ -126,11 +127,9 @@ const Workspace: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium mb-1 text-text-muted">Audience Level</label>
                 <select value={audience} onChange={e => setAudience(e.target.value)} className="w-full bg-white border border-border rounded px-3 py-2 text-text focus:outline-none focus:border-primary">
+                  <option value="Field force">Field force</option>
+                  <option value="MSLs">MSLs</option>
                   <option value="Doctor">Doctor</option>
-                  <option value="HCP">HCP</option>
-                  <option value="Professional">Professional</option>
-                  <option value="Patient">Patient</option>
-                  <option value="Scientist">Scientist</option>
                 </select>
               </div>
               <div>
@@ -163,6 +162,7 @@ const Workspace: React.FC = () => {
             <thead className="bg-slate-50/80 border-b border-border text-text">
               <tr>
                 <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Publication Name</th>
+                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Uploaded By</th>
                 <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Audience</th>
                 <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Asset Type</th>
                 <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs text-right">Action</th>
@@ -172,6 +172,12 @@ const Workspace: React.FC = () => {
               {assets.map((asset) => (
                 <tr key={asset.generation_id} className="hover:bg-blue-50/50 transition-colors group">
                   <td className="px-6 py-5 text-text font-medium">{asset.publication_title}</td>
+                  <td className="px-6 py-5">
+                    <span className="text-sm font-semibold text-text flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs">{asset.uploaded_by ? asset.uploaded_by.charAt(0).toUpperCase() : '?'}</div>
+                      {asset.uploaded_by}
+                    </span>
+                  </td>
                   <td className="px-6 py-5"><span className="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold tracking-wide">{asset.audience_level}</span></td>
                   <td className="px-6 py-5"><span className="px-3 py-1.5 bg-cyan-50 text-cyan-700 rounded-full text-xs font-bold tracking-wide">{asset.asset_type}</span></td>
                   <td className="px-6 py-5 text-right">
@@ -197,7 +203,7 @@ const Workspace: React.FC = () => {
               ))}
               {assets.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-text-muted">
+                  <td colSpan={5} className="px-6 py-8 text-center text-text-muted">
                     No assets found. Upload one to get started.
                   </td>
                 </tr>
