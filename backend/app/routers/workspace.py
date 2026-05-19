@@ -7,10 +7,12 @@ import shutil
 import os
 from uuid import uuid4
 from app.core.config import settings
+from google.cloud import storage
 
 router = APIRouter(prefix="/workspace", tags=["workspace"])
 
-os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+if settings.GOOGLE_APPLICATION_CREDENTIALS:
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = settings.GOOGLE_APPLICATION_CREDENTIALS
 
 @router.get("/assets")
 def get_assets(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
@@ -44,21 +46,22 @@ def create_asset(
     if current_user.role not in ['admin', 'creator']:
         raise HTTPException(status_code=403, detail="Not authorized to create assets")
     
-    # Save PDF
-    pdf_filename = f"{uuid4()}_{pdf_file.filename}"
-    pdf_path = os.path.join(settings.UPLOAD_DIR, pdf_filename)
-    with open(pdf_path, "wb") as buffer:
-        shutil.copyfileobj(pdf_file.file, buffer)
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(settings.GOOGLE_CLOUD_BUCKET)
+    
+    # Save PDF to GCS
+    pdf_filename = f"uploads/{uuid4()}_{pdf_file.filename}"
+    pdf_blob = bucket.blob(pdf_filename)
+    pdf_blob.upload_from_file(pdf_file.file, content_type=pdf_file.content_type)
         
-    # Save Asset File
-    asset_filename = f"{uuid4()}_{asset_file.filename}"
-    asset_path = os.path.join(settings.UPLOAD_DIR, asset_filename)
-    with open(asset_path, "wb") as buffer:
-        shutil.copyfileobj(asset_file.file, buffer)
+    # Save Asset File to GCS
+    asset_filename = f"uploads/{uuid4()}_{asset_file.filename}"
+    asset_blob = bucket.blob(asset_filename)
+    asset_blob.upload_from_file(asset_file.file, content_type=asset_file.content_type)
         
-    # Create DB records
-    pdf_url = f"/uploads/{pdf_filename}"
-    generation_url = f"/uploads/{asset_filename}"
+    # Create DB records with GCS URLs
+    pdf_url = f"https://storage.googleapis.com/{settings.GOOGLE_CLOUD_BUCKET}/{pdf_filename}"
+    generation_url = f"https://storage.googleapis.com/{settings.GOOGLE_CLOUD_BUCKET}/{asset_filename}"
     
     new_pub = models.Publication(
         title=title,
