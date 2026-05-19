@@ -168,7 +168,7 @@ const StudioView: React.FC = () => {
         {/* Left Panel - PDF Viewer (Col span 5) */}
         <div className="col-span-5 bg-background flex flex-col h-full p-6">
           <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted">Source Reference (PDF)</div>
-          <div className="flex-1 bg-surface rounded-2xl shadow-xl border border-border overflow-hidden">
+          <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden">
             <iframe 
               src={getFullUrl(data.publication.pdf_url)} 
               className="w-full h-full border-0"
@@ -183,7 +183,7 @@ const StudioView: React.FC = () => {
             <span>Generated Asset</span>
             <a href={getFullUrl(data.generation.generation_url)} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-hover lowercase font-semibold tracking-normal">Open Original</a>
           </div>
-          <div className="flex-1 bg-surface rounded-2xl shadow-xl border border-border overflow-hidden">
+          <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden">
             {renderAssetPlayer()}
           </div>
         </div>
@@ -196,7 +196,7 @@ const StudioView: React.FC = () => {
               <p className="text-text-muted text-sm text-center mt-8 italic">No comments yet. Start the review!</p>
             ) : (
               data.comments.map(comment => (
-                <div key={comment.id} className="bg-slate-50 p-4 rounded-2xl rounded-tl-sm text-sm border border-slate-100 shadow-sm">
+                <div key={comment.id} className="bg-slate-50 p-4 rounded-md rounded-tl-sm text-sm border border-slate-100 shadow-sm">
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-bold text-primary truncate w-3/4">{comment.user}</span>
                     <span className="text-xs text-text-muted font-medium">{new Date(comment.created_at).toLocaleDateString()}</span>
@@ -214,12 +214,12 @@ const StudioView: React.FC = () => {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add a comment..."
-                className="flex-1 bg-slate-50 border border-border rounded-full px-5 py-2.5 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                className="flex-1 bg-slate-50 border border-border rounded-md px-5 py-2.5 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               />
               <button 
                 type="submit" 
                 disabled={!newComment.trim()}
-                className="bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary disabled:opacity-50 text-white p-3 rounded-full flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+                className="bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary disabled:opacity-50 text-white p-3 rounded-md flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
               >
                 <Send size={16} />
               </button>
