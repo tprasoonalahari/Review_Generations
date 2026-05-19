@@ -99,14 +99,14 @@ const StudioView: React.FC = () => {
 
     if (lowerUrl.endsWith('.mp4') || lowerUrl.endsWith('.webm') || lowerUrl.endsWith('.mov')) {
       return (
-        <video controls className="w-full h-full object-contain bg-black">
+        <video controls className="absolute inset-0 w-full h-full object-contain bg-black">
           <source src={url} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       );
     } else if (lowerUrl.endsWith('.mp3') || lowerUrl.endsWith('.wav')) {
       return (
-        <div className="flex items-center justify-center h-full bg-surface">
+        <div className="absolute inset-0 flex items-center justify-center bg-surface">
           <audio controls className="w-full max-w-md">
             <source src={url} />
             Your browser does not support the audio element.
@@ -115,7 +115,7 @@ const StudioView: React.FC = () => {
       );
     } else if (lowerUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)$/)) {
       return (
-        <div className="w-full h-full overflow-auto flex items-center justify-center bg-surface">
+        <div className="absolute inset-0 overflow-auto flex items-center justify-center bg-surface">
           <img src={url} alt="Generated Asset" className="max-w-full max-h-full object-contain" />
         </div>
       );
@@ -123,7 +123,7 @@ const StudioView: React.FC = () => {
       return (
         <iframe 
           src={url} 
-          className="w-full h-full border-0"
+          className="absolute inset-0 w-full h-full border-0"
           title="Asset Preview"
         />
       );
@@ -136,7 +136,7 @@ const StudioView: React.FC = () => {
       }
       
       return (
-        <div className="flex flex-col h-full bg-surface text-text" ref={iframeContainerRef}>
+        <div className="absolute inset-0 flex flex-col h-full bg-surface text-text" ref={iframeContainerRef}>
           <div className="flex-1 relative w-full bg-white">
             <iframe 
               src={viewerUrl}
@@ -195,10 +195,10 @@ const StudioView: React.FC = () => {
                 <X size={16} />
               </button>
             </div>
-            <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden flex flex-col min-h-0">
+            <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden relative">
               <iframe 
                 src={getFullUrl(data.publication.pdf_url)} 
-                className="w-full h-full border-0"
+                className="absolute inset-0 w-full h-full border-0"
                 title="PDF Viewer"
               />
             </div>
@@ -210,7 +210,7 @@ const StudioView: React.FC = () => {
           <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted flex justify-between items-center">
             <span>Generated Asset</span>
           </div>
-          <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden flex flex-col min-h-0">
+          <div key={isPdfOpen ? 'open' : 'closed'} className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden relative">
             {renderAssetPlayer()}
           </div>
         </div>
