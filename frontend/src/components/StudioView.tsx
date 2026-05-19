@@ -94,25 +94,25 @@ const StudioView: React.FC = () => {
 
   const renderAssetPlayer = () => {
     const url = getFullUrl(data.generation.generation_url);
-    const type = data.generation.asset_type;
+    const lowerUrl = url.toLowerCase();
 
-    if (type === 'Video' || url.endsWith('.mp4')) {
+    if (lowerUrl.endsWith('.mp4') || lowerUrl.endsWith('.webm') || lowerUrl.endsWith('.mov')) {
       return (
         <video controls className="w-full h-full object-contain bg-black">
           <source src={url} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       );
-    } else if (url.endsWith('.mp3')) {
+    } else if (lowerUrl.endsWith('.mp3') || lowerUrl.endsWith('.wav')) {
       return (
         <div className="flex items-center justify-center h-full bg-surface">
           <audio controls className="w-full max-w-md">
-            <source src={url} type="audio/mpeg" />
+            <source src={url} />
             Your browser does not support the audio element.
           </audio>
         </div>
       );
-    } else if (type === 'Poster' || type === 'Infographic' || url.match(/\.(jpeg|jpg|gif|png)$/) != null) {
+    } else if (lowerUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)$/)) {
       return (
         <div className="w-full h-full overflow-auto flex items-center justify-center bg-surface">
           <img src={url} alt="Generated Asset" className="max-w-full max-h-full object-contain" />
