@@ -131,10 +131,7 @@ const StudioView: React.FC = () => {
               title="Asset Preview"
             />
           </div>
-          <div className="p-4 bg-background border-t border-border flex flex-wrap justify-between items-center shrink-0">
-            <div className="text-xs text-text-muted max-w-sm">
-              Note: Preview uses Google Docs Viewer. The asset URL must be publicly accessible (not localhost) for the preview to load.
-            </div>
+          <div className="p-4 bg-background border-t border-border flex justify-end shrink-0">
             <div className="flex gap-3">
               <button onClick={toggleFullscreen} className="bg-surface hover:bg-gray-100 border border-border text-text px-4 py-2 rounded text-sm transition-colors cursor-pointer">
                 View Fullscreen
