@@ -195,7 +195,7 @@ const StudioView: React.FC = () => {
                 <X size={16} />
               </button>
             </div>
-            <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden">
+            <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden flex flex-col min-h-0">
               <iframe 
                 src={getFullUrl(data.publication.pdf_url)} 
                 className="w-full h-full border-0"
@@ -210,7 +210,7 @@ const StudioView: React.FC = () => {
           <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted flex justify-between items-center">
             <span>Generated Asset</span>
           </div>
-          <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden">
+          <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden flex flex-col min-h-0">
             {renderAssetPlayer()}
           </div>
         </div>
