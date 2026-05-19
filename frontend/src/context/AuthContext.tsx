@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import api from '../api/axios';
 
 interface User {
   email: string;
