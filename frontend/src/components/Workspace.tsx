@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
-import { Plus, Search, LogOut } from 'lucide-react';
+import { Plus, Search, LogOut, Trash2 } from 'lucide-react';
 
 interface Asset {
   publication_id: string;
@@ -73,47 +73,59 @@ const Workspace: React.FC = () => {
     navigate('/login');
   };
 
+  const handleDelete = async (generationId: string) => {
+    if (window.confirm('Are you sure you want to delete this asset?')) {
+      try {
+        await api.delete(`/workspace/assets/${generationId}`);
+        fetchAssets();
+      } catch (error) {
+        console.error('Error deleting asset:', error);
+        alert('Failed to delete asset. Please try again.');
+      }
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-300 p-8">
+    <div className="min-h-screen bg-background text-text p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-white">Review & Hub Workspace</h1>
+          <h1 className="text-3xl font-bold text-text">Review & Hub Workspace</h1>
           <div className="flex gap-4">
             {(user?.role === 'admin' || user?.role === 'creator') && (
               <button 
                 onClick={() => setShowForm(!showForm)}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors"
+                className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded transition-colors"
               >
                 <Plus size={20} /> Add New Asset
               </button>
             )}
-            <button onClick={handleLogout} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+            <button onClick={handleLogout} className="flex items-center gap-2 text-text-muted hover:text-text transition-colors">
               <LogOut size={20} /> Logout
             </button>
           </div>
         </div>
 
         {showForm && (
-          <div className="bg-slate-800 p-6 rounded-lg mb-8 border border-slate-700 shadow-lg">
-            <h2 className="text-xl font-semibold text-white mb-4">Upload New Publication & Asset</h2>
+          <div className="bg-surface p-6 rounded-lg mb-8 border border-border shadow-md">
+            <h2 className="text-xl font-semibold text-text mb-4">Upload New Publication & Asset</h2>
             <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium mb-1">Publication Title</label>
+                <label className="block text-sm font-medium mb-1 text-text-muted">Publication Title</label>
                 <input 
                   type="text" required value={title} onChange={e => setTitle(e.target.value)}
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-white border border-border rounded px-3 py-2 text-text focus:outline-none focus:border-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Publication PDF</label>
+                <label className="block text-sm font-medium mb-1 text-text-muted">Publication PDF</label>
                 <input 
                   type="file" accept=".pdf" required onChange={e => setPdfFile(e.target.files?.[0] || null)}
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-1.5 text-white file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-slate-600 file:text-white hover:file:bg-slate-500 cursor-pointer"
+                  className="w-full bg-white border border-border rounded px-3 py-1.5 text-text file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Audience Level</label>
-                <select value={audience} onChange={e => setAudience(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+                <label className="block text-sm font-medium mb-1 text-text-muted">Audience Level</label>
+                <select value={audience} onChange={e => setAudience(e.target.value)} className="w-full bg-white border border-border rounded px-3 py-2 text-text focus:outline-none focus:border-primary">
                   <option value="Doctor">Doctor</option>
                   <option value="HCP">HCP</option>
                   <option value="Professional">Professional</option>
@@ -122,8 +134,8 @@ const Workspace: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Asset Type</label>
-                <select value={assetType} onChange={e => setAssetType(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+                <label className="block text-sm font-medium mb-1 text-text-muted">Asset Type</label>
+                <select value={assetType} onChange={e => setAssetType(e.target.value)} className="w-full bg-white border border-border rounded px-3 py-2 text-text focus:outline-none focus:border-primary">
                   <option value="Video">Video</option>
                   <option value="PPT">PPT</option>
                   <option value="Poster">Poster</option>
@@ -131,14 +143,14 @@ const Workspace: React.FC = () => {
                 </select>
               </div>
               <div className="col-span-2">
-                <label className="block text-sm font-medium mb-1">Generation Asset File (MP4, MP3, PPTX, etc)</label>
+                <label className="block text-sm font-medium mb-1 text-text-muted">Generation Asset File (MP4, MP3, PPTX, etc)</label>
                 <input 
                   type="file" required onChange={e => setAssetFile(e.target.files?.[0] || null)}
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-1.5 text-white file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-slate-600 file:text-white hover:file:bg-slate-500 cursor-pointer"
+                  className="w-full bg-white border border-border rounded px-3 py-1.5 text-text file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer"
                 />
               </div>
               <div className="col-span-2 flex justify-end">
-                <button type="submit" disabled={loading} className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-6 py-2 rounded font-medium transition-colors">
+                <button type="submit" disabled={loading} className="bg-primary hover:bg-primary-hover disabled:opacity-50 text-white px-6 py-2 rounded font-medium transition-colors">
                   {loading ? 'Uploading...' : 'Submit Records'}
                 </button>
               </div>
@@ -146,9 +158,9 @@ const Workspace: React.FC = () => {
           </div>
         )}
 
-        <div className="bg-slate-800 rounded-lg overflow-hidden border border-slate-700 shadow-lg">
+        <div className="bg-surface rounded-lg overflow-hidden border border-border shadow-md">
           <table className="w-full text-left">
-            <thead className="bg-slate-700/50 border-b border-slate-700 text-slate-300">
+            <thead className="bg-background border-b border-border text-text">
               <tr>
                 <th className="px-6 py-4 font-semibold">Publication Name</th>
                 <th className="px-6 py-4 font-semibold">Audience</th>
@@ -156,25 +168,36 @@ const Workspace: React.FC = () => {
                 <th className="px-6 py-4 font-semibold text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700/50">
+            <tbody className="divide-y divide-border">
               {assets.map((asset) => (
-                <tr key={asset.generation_id} className="hover:bg-slate-700/30 transition-colors">
-                  <td className="px-6 py-4 text-white">{asset.publication_title}</td>
-                  <td className="px-6 py-4"><span className="px-2 py-1 bg-slate-700 rounded text-sm text-slate-300">{asset.audience_level}</span></td>
-                  <td className="px-6 py-4"><span className="px-2 py-1 bg-blue-900/50 text-blue-300 rounded text-sm">{asset.asset_type}</span></td>
+                <tr key={asset.generation_id} className="hover:bg-background/50 transition-colors">
+                  <td className="px-6 py-4 text-text">{asset.publication_title}</td>
+                  <td className="px-6 py-4"><span className="px-2 py-1 bg-background border border-border rounded text-sm text-text-muted">{asset.audience_level}</span></td>
+                  <td className="px-6 py-4"><span className="px-2 py-1 bg-primary/10 text-primary rounded text-sm font-medium">{asset.asset_type}</span></td>
                   <td className="px-6 py-4 text-right">
-                    <button 
-                      onClick={() => navigate(`/review/${asset.generation_id}`)}
-                      className="inline-flex items-center gap-2 bg-slate-700 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors"
-                    >
-                      <Search size={16} /> Review Asset
-                    </button>
+                    <div className="flex justify-end gap-2">
+                      <button 
+                        onClick={() => navigate(`/review/${asset.generation_id}`)}
+                        className="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded transition-colors"
+                      >
+                        <Search size={16} /> Review Asset
+                      </button>
+                      {(user?.role === 'admin' || user?.role === 'creator') && (
+                        <button 
+                          onClick={() => handleDelete(asset.generation_id)}
+                          className="inline-flex items-center justify-center bg-white border border-border hover:bg-red-50 text-red-500 hover:text-red-600 px-3 py-2 rounded transition-colors"
+                          title="Delete Asset"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
               {assets.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-text-muted">
                     No assets found. Upload one to get started.
                   </td>
                 </tr>

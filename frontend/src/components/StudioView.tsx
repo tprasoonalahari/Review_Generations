@@ -79,11 +79,11 @@ const StudioView: React.FC = () => {
 
 
   if (loading) {
-    return <div className="h-screen bg-slate-900 flex items-center justify-center text-white">Loading Studio...</div>;
+    return <div className="h-screen bg-background flex items-center justify-center text-text">Loading Studio...</div>;
   }
 
   if (!data) {
-    return <div className="h-screen bg-slate-900 flex items-center justify-center text-white">Asset not found.</div>;
+    return <div className="h-screen bg-background flex items-center justify-center text-text">Asset not found.</div>;
   }
 
   const renderAssetPlayer = () => {
@@ -99,7 +99,7 @@ const StudioView: React.FC = () => {
       );
     } else if (url.endsWith('.mp3')) {
       return (
-        <div className="flex items-center justify-center h-full bg-slate-800">
+        <div className="flex items-center justify-center h-full bg-surface">
           <audio controls className="w-full max-w-md">
             <source src={url} type="audio/mpeg" />
             Your browser does not support the audio element.
@@ -108,7 +108,7 @@ const StudioView: React.FC = () => {
       );
     } else if (type === 'Poster' || type === 'Infographic' || url.match(/\.(jpeg|jpg|gif|png)$/) != null) {
       return (
-        <div className="w-full h-full overflow-auto flex items-center justify-center bg-slate-800">
+        <div className="w-full h-full overflow-auto flex items-center justify-center bg-surface">
           <img src={url} alt="Generated Asset" className="max-w-full max-h-full object-contain" />
         </div>
       );
@@ -117,7 +117,7 @@ const StudioView: React.FC = () => {
       const googleDocsViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
       
       return (
-        <div className="flex flex-col h-full bg-slate-800 text-slate-300" ref={iframeContainerRef}>
+        <div className="flex flex-col h-full bg-surface text-text" ref={iframeContainerRef}>
           <div className="flex-1 relative w-full bg-white">
             <iframe 
               src={googleDocsViewerUrl}
@@ -125,15 +125,15 @@ const StudioView: React.FC = () => {
               title="Asset Preview"
             />
           </div>
-          <div className="p-4 bg-slate-900 border-t border-slate-700 flex flex-wrap justify-between items-center shrink-0">
-            <div className="text-xs text-slate-400 max-w-sm">
+          <div className="p-4 bg-background border-t border-border flex flex-wrap justify-between items-center shrink-0">
+            <div className="text-xs text-text-muted max-w-sm">
               Note: Preview uses Google Docs Viewer. The asset URL must be publicly accessible (not localhost) for the preview to load.
             </div>
             <div className="flex gap-3">
-              <button onClick={toggleFullscreen} className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded text-sm transition-colors cursor-pointer">
+              <button onClick={toggleFullscreen} className="bg-surface hover:bg-gray-100 border border-border text-text px-4 py-2 rounded text-sm transition-colors cursor-pointer">
                 View Fullscreen
               </button>
-              <a href={url} download target="_blank" rel="noopener noreferrer" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm transition-colors">
+              <a href={url} download target="_blank" rel="noopener noreferrer" className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded text-sm transition-colors">
                 Download Asset
               </a>
             </div>
@@ -144,16 +144,16 @@ const StudioView: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-slate-900 text-slate-300 overflow-hidden">
+    <div className="h-screen flex flex-col bg-background text-text overflow-hidden">
       {/* Header */}
-      <header className="h-14 border-b border-slate-700 bg-slate-800 flex items-center px-4 justify-between shrink-0">
+      <header className="h-14 border-b border-border bg-surface flex items-center px-4 justify-between shrink-0">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/workspace')} className="text-slate-400 hover:text-white transition-colors">
+          <button onClick={() => navigate('/workspace')} className="text-text-muted hover:text-primary transition-colors">
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h1 className="text-white font-semibold truncate max-w-xl">{data.publication.title}</h1>
-            <div className="text-xs text-slate-400 flex gap-2">
+            <h1 className="text-text font-semibold truncate max-w-xl">{data.publication.title}</h1>
+            <div className="text-xs text-text-muted flex gap-2">
               <span>{data.generation.asset_type}</span> &bull; <span>{data.generation.audience_level}</span>
             </div>
           </div>
@@ -161,11 +161,11 @@ const StudioView: React.FC = () => {
       </header>
 
       {/* Main Grid Grid */}
-      <div className="flex-1 grid grid-cols-12 h-[calc(100vh-3.5rem)]">
+      <div className="flex-1 grid grid-cols-12 h-[calc(100vh-3.5rem)] bg-background">
         {/* Left Panel - PDF Viewer (Col span 5) */}
-        <div className="col-span-5 border-r border-slate-700 bg-slate-800 flex flex-col h-full">
-          <div className="px-4 py-2 bg-slate-800/80 border-b border-slate-700 text-sm font-semibold sticky top-0">Source Reference (PDF)</div>
-          <div className="flex-1 p-2 bg-slate-900 h-full">
+        <div className="col-span-5 border-r border-border bg-surface flex flex-col h-full">
+          <div className="px-4 py-2 bg-surface/90 border-b border-border text-sm font-semibold sticky top-0 text-text">Source Reference (PDF)</div>
+          <div className="flex-1 p-2 bg-background h-full">
             <iframe 
               src={`${API_BASE_URL}${data.publication.pdf_url}`} 
               className="w-full h-full border-0 bg-white rounded"
@@ -175,10 +175,10 @@ const StudioView: React.FC = () => {
         </div>
 
         {/* Middle Panel - Asset Viewer (Col span 5) */}
-        <div className="col-span-5 border-r border-slate-700 bg-slate-900 flex flex-col h-full">
-          <div className="px-4 py-2 bg-slate-800/80 border-b border-slate-700 text-sm font-semibold sticky top-0 flex justify-between items-center">
+        <div className="col-span-5 border-r border-border bg-background flex flex-col h-full">
+          <div className="px-4 py-2 bg-surface/90 border-b border-border text-sm font-semibold sticky top-0 flex justify-between items-center text-text">
             <span>Generated Asset</span>
-            <a href={`${API_BASE_URL}${data.generation.generation_url}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs">Open Original</a>
+            <a href={`${API_BASE_URL}${data.generation.generation_url}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-hover text-xs font-semibold">Open Original</a>
           </div>
           <div className="flex-1 overflow-hidden h-full">
             {renderAssetPlayer()}
@@ -186,37 +186,37 @@ const StudioView: React.FC = () => {
         </div>
 
         {/* Right Panel - Comments (Col span 2) */}
-        <div className="col-span-2 bg-slate-800 flex flex-col h-full">
-          <div className="px-4 py-2 bg-slate-800/80 border-b border-slate-700 text-sm font-semibold sticky top-0">Review Comments</div>
+        <div className="col-span-2 bg-surface flex flex-col h-full">
+          <div className="px-4 py-2 bg-surface/90 border-b border-border text-sm font-semibold sticky top-0 text-text">Review Comments</div>
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
             {data.comments.length === 0 ? (
-              <p className="text-slate-500 text-sm text-center mt-4">No comments yet. Start the review!</p>
+              <p className="text-text-muted text-sm text-center mt-4">No comments yet. Start the review!</p>
             ) : (
               data.comments.map(comment => (
-                <div key={comment.id} className="bg-slate-700/50 p-3 rounded-lg text-sm border border-slate-700">
+                <div key={comment.id} className="bg-white p-3 rounded-lg text-sm border border-border shadow-sm">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="font-semibold text-blue-400 truncate w-3/4">{comment.user}</span>
-                    <span className="text-xs text-slate-500">{new Date(comment.created_at).toLocaleDateString()}</span>
+                    <span className="font-semibold text-primary truncate w-3/4">{comment.user}</span>
+                    <span className="text-xs text-text-muted">{new Date(comment.created_at).toLocaleDateString()}</span>
                   </div>
-                  <p className="text-slate-200 break-words">{comment.text}</p>
+                  <p className="text-text break-words">{comment.text}</p>
                 </div>
               ))
             )}
             <div ref={commentsEndRef} />
           </div>
-          <div className="p-4 bg-slate-800 border-t border-slate-700 shrink-0">
+          <div className="p-4 bg-surface border-t border-border shrink-0">
             <form onSubmit={handleCommentSubmit} className="flex gap-2">
               <input
                 type="text"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add comment..."
-                className="flex-1 bg-slate-900 border border-slate-600 rounded-l px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                className="flex-1 bg-white border border-border rounded-l px-3 py-2 text-sm text-text focus:outline-none focus:border-primary"
               />
               <button 
                 type="submit" 
                 disabled={!newComment.trim()}
-                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-3 py-2 rounded-r flex items-center justify-center transition-colors"
+                className="bg-primary hover:bg-primary-hover disabled:opacity-50 text-white px-3 py-2 rounded-r flex items-center justify-center transition-colors"
               >
                 <Send size={16} />
               </button>

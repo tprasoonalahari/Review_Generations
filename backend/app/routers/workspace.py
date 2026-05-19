@@ -5,7 +5,7 @@ from app.routers.auth import get_current_user
 from typing import List
 import shutil
 import os
-from uuid import uuid4
+from uuid import uuid4, UUID
 from app.core.config import settings
 from google.cloud import storage
 
@@ -83,3 +83,29 @@ def create_asset(
     db.refresh(new_gen)
     
     return {"message": "Asset created successfully", "publication_id": new_pub.id, "generation_id": new_gen.id}
+
+@router.delete("/assets/{generation_id}")
+def delete_asset(
+    generation_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if current_user.role not in ['admin', 'creator']:
+        raise HTTPException(status_code=403, detail="Not authorized to delete assets")
+        
+    generation = db.query(models.Generation).filter(models.Generation.id == generation_id).first()
+    if not generation:
+        raise HTTPException(status_code=404, detail="Asset not found")
+        
+    pub_id = generation.publication_id
+    db.delete(generation)
+    
+    # Check if publication has other generations, if not, delete it too
+    other_gens = db.query(models.Generation).filter(models.Generation.publication_id == pub_id).count()
+    if other_gens == 0:
+        pub = db.query(models.Publication).filter(models.Publication.id == pub_id).first()
+        if pub:
+            db.delete(pub)
+            
+    db.commit()
+    return {"message": "Asset deleted successfully"}
