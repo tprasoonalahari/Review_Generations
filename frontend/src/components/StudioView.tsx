@@ -152,77 +152,77 @@ const StudioView: React.FC = () => {
   return (
     <div className="h-screen flex flex-col bg-background text-text overflow-hidden">
       {/* Header */}
-      <header className="h-14 border-b border-border bg-surface flex items-center px-4 justify-between shrink-0">
-        <div className="flex items-center gap-4">
+      <header className="h-16 border-b border-border bg-surface flex items-center px-6 justify-between shrink-0 shadow-sm z-10">
+        <div className="flex items-center gap-6">
           <button onClick={() => navigate('/workspace')} className="text-text-muted hover:text-primary transition-colors">
-            <ArrowLeft size={20} />
+            <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-text font-semibold truncate max-w-xl">{data.publication.title}</h1>
-            <div className="text-xs text-text-muted flex gap-2">
-              <span>{data.generation.asset_type}</span> &bull; <span>{data.generation.audience_level}</span>
+            <h1 className="text-text font-bold text-lg truncate max-w-xl">{data.publication.title}</h1>
+            <div className="text-xs text-text-muted flex gap-2 font-medium">
+              <span className="uppercase tracking-wider">{data.generation.asset_type}</span> &bull; <span>{data.generation.audience_level}</span>
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Grid Grid */}
-      <div className="flex-1 grid grid-cols-12 h-[calc(100vh-3.5rem)] bg-background">
+      <div className="flex-1 grid grid-cols-12 h-[calc(100vh-4rem)] bg-background">
         {/* Left Panel - PDF Viewer (Col span 5) */}
-        <div className="col-span-5 border-r border-border bg-surface flex flex-col h-full">
-          <div className="px-4 py-2 bg-surface/90 border-b border-border text-sm font-semibold sticky top-0 text-text">Source Reference (PDF)</div>
-          <div className="flex-1 p-2 bg-background h-full">
+        <div className="col-span-5 bg-background flex flex-col h-full p-6">
+          <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted">Source Reference (PDF)</div>
+          <div className="flex-1 bg-surface rounded-2xl shadow-xl border border-border overflow-hidden">
             <iframe 
               src={getFullUrl(data.publication.pdf_url)} 
-              className="w-full h-full border-0 bg-white rounded"
+              className="w-full h-full border-0"
               title="PDF Viewer"
             />
           </div>
         </div>
 
         {/* Middle Panel - Asset Viewer (Col span 5) */}
-        <div className="col-span-5 border-r border-border bg-background flex flex-col h-full">
-          <div className="px-4 py-2 bg-surface/90 border-b border-border text-sm font-semibold sticky top-0 flex justify-between items-center text-text">
+        <div className="col-span-5 bg-background flex flex-col h-full p-6 pl-0">
+          <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted flex justify-between items-center">
             <span>Generated Asset</span>
-            <a href={getFullUrl(data.generation.generation_url)} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-hover text-xs font-semibold">Open Original</a>
+            <a href={getFullUrl(data.generation.generation_url)} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-hover lowercase font-semibold tracking-normal">Open Original</a>
           </div>
-          <div className="flex-1 overflow-hidden h-full">
+          <div className="flex-1 bg-surface rounded-2xl shadow-xl border border-border overflow-hidden">
             {renderAssetPlayer()}
           </div>
         </div>
 
         {/* Right Panel - Comments (Col span 2) */}
-        <div className="col-span-2 bg-surface flex flex-col h-full">
-          <div className="px-4 py-2 bg-surface/90 border-b border-border text-sm font-semibold sticky top-0 text-text">Review Comments</div>
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+        <div className="col-span-2 bg-white flex flex-col h-full border-l border-border shadow-[-10px_0_15px_-3px_rgba(0,0,0,0.05)] z-10">
+          <div className="px-6 py-5 border-b border-border text-xs font-bold tracking-widest uppercase text-text-muted bg-slate-50/50">Review Comments</div>
+          <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
             {data.comments.length === 0 ? (
-              <p className="text-text-muted text-sm text-center mt-4">No comments yet. Start the review!</p>
+              <p className="text-text-muted text-sm text-center mt-8 italic">No comments yet. Start the review!</p>
             ) : (
               data.comments.map(comment => (
-                <div key={comment.id} className="bg-white p-3 rounded-lg text-sm border border-border shadow-sm">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-semibold text-primary truncate w-3/4">{comment.user}</span>
-                    <span className="text-xs text-text-muted">{new Date(comment.created_at).toLocaleDateString()}</span>
+                <div key={comment.id} className="bg-slate-50 p-4 rounded-2xl rounded-tl-sm text-sm border border-slate-100 shadow-sm">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-bold text-primary truncate w-3/4">{comment.user}</span>
+                    <span className="text-xs text-text-muted font-medium">{new Date(comment.created_at).toLocaleDateString()}</span>
                   </div>
-                  <p className="text-text break-words">{comment.text}</p>
+                  <p className="text-text break-words leading-relaxed">{comment.text}</p>
                 </div>
               ))
             )}
             <div ref={commentsEndRef} />
           </div>
-          <div className="p-4 bg-surface border-t border-border shrink-0">
+          <div className="p-4 bg-white border-t border-border shrink-0">
             <form onSubmit={handleCommentSubmit} className="flex gap-2">
               <input
                 type="text"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add comment..."
-                className="flex-1 bg-white border border-border rounded-l px-3 py-2 text-sm text-text focus:outline-none focus:border-primary"
+                placeholder="Add a comment..."
+                className="flex-1 bg-slate-50 border border-border rounded-full px-5 py-2.5 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               />
               <button 
                 type="submit" 
                 disabled={!newComment.trim()}
-                className="bg-primary hover:bg-primary-hover disabled:opacity-50 text-white px-3 py-2 rounded-r flex items-center justify-center transition-colors"
+                className="bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary disabled:opacity-50 text-white p-3 rounded-full flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
               >
                 <Send size={16} />
               </button>

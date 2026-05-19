@@ -32,31 +32,31 @@ const Login: React.FC = () => {
 
   return (
     <div className="flex h-screen items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8 bg-surface rounded-lg shadow-xl border border-border">
-        <h2 className="text-2xl font-bold text-center text-text mb-6">Review & Hub</h2>
+      <div className="w-full max-w-md p-10 bg-surface rounded-2xl shadow-2xl shadow-blue-900/5 border border-white">
+        <h2 className="text-3xl font-extrabold text-center text-text mb-8 tracking-tight">Review & Hub</h2>
         {error && <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-2 rounded mb-4">{error}</div>}
         <form onSubmit={handleLogin}>
-          <div className="mb-4">
-            <label className="block text-text-muted text-sm font-bold mb-2">Email</label>
+          <div className="mb-5">
+            <label className="block text-text-muted text-sm font-semibold mb-2">Email</label>
             <input 
               type="email" 
-              className="w-full px-3 py-2 bg-white text-text border border-border rounded focus:outline-none focus:border-primary"
+              className="w-full px-4 py-3 bg-background/50 text-text border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
-          <div className="mb-6">
-            <label className="block text-text-muted text-sm font-bold mb-2">Password</label>
+          <div className="mb-8">
+            <label className="block text-text-muted text-sm font-semibold mb-2">Password</label>
             <input 
               type="password" 
-              className="w-full px-3 py-2 bg-white text-text border border-border rounded focus:outline-none focus:border-primary"
+              className="w-full px-4 py-3 bg-background/50 text-text border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
-          <button type="submit" className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded transition-colors">
+          <button type="submit" className="w-full bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transform transition-all duration-200">
             Login
           </button>
         </form>
