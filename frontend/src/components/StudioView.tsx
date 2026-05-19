@@ -24,6 +24,8 @@ interface GenerationData {
   comments: Comment[];
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const StudioView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -85,7 +87,7 @@ const StudioView: React.FC = () => {
   }
 
   const renderAssetPlayer = () => {
-    const url = `http://localhost:8000${data.generation.generation_url}`;
+    const url = `${API_BASE_URL}${data.generation.generation_url}`;
     const type = data.generation.asset_type;
 
     if (type === 'Video' || url.endsWith('.mp4')) {
@@ -165,7 +167,7 @@ const StudioView: React.FC = () => {
           <div className="px-4 py-2 bg-slate-800/80 border-b border-slate-700 text-sm font-semibold sticky top-0">Source Reference (PDF)</div>
           <div className="flex-1 p-2 bg-slate-900 h-full">
             <iframe 
-              src={`http://localhost:8000${data.publication.pdf_url}`} 
+              src={`${API_BASE_URL}${data.publication.pdf_url}`} 
               className="w-full h-full border-0 bg-white rounded"
               title="PDF Viewer"
             />
@@ -176,7 +178,7 @@ const StudioView: React.FC = () => {
         <div className="col-span-5 border-r border-slate-700 bg-slate-900 flex flex-col h-full">
           <div className="px-4 py-2 bg-slate-800/80 border-b border-slate-700 text-sm font-semibold sticky top-0 flex justify-between items-center">
             <span>Generated Asset</span>
-            <a href={`http://localhost:8000${data.generation.generation_url}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs">Open Original</a>
+            <a href={`${API_BASE_URL}${data.generation.generation_url}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs">Open Original</a>
           </div>
           <div className="flex-1 overflow-hidden h-full">
             {renderAssetPlayer()}
