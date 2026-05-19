@@ -1,0 +1,131 @@
+
+
+```markdown
+# System Specification: Collaborative Review Workspace & Split-Screen Asset Hub
+
+## 1. Project Objective
+We are building a collaborative "Review & Hub" tab for a platform that converts medical publications into multimodal assets (Videos, PPTs, Posters). This feature requires user authentication, an entry form, a centralized tracking table, and a split-screen "Studio View" for asset verification and commenting.
+
+## 2. Tech Stack Requirements
+- Backend: Python / FastAPI
+- Database: PostgreSQL (with relational constraints)
+- Frontend: React / Tailwind CSS (or matching existing frontend framework)
+
+---
+
+## 3. Database Schema (PostgreSQL)
+DATABASE_URL="postgresql://postgres:Pubvision_123@localhost:5432/GenerationView"
+Execute the following database structure to support users, publications, generations, and context-specific comments:
+
+```sql
+-- Enable UUID extension if not already enabled
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Enums for strict validation
+CREATE TYPE audience_level_enum AS ENUM ('Doctor', 'HCP', 'Professional', 'Patient', 'Scientist');
+CREATE TYPE asset_type_enum AS ENUM ('Video', 'PPT', 'Poster', 'Infographic');
+
+-- 1. Users Table
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(50) DEFAULT 'viewer', -- 'admin', 'creator', 'viewer'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Publications Table
+CREATE TABLE publications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(255) NOT NULL,
+    pdf_url TEXT NOT NULL,
+    uploaded_by UUID REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Generations Table
+CREATE TABLE generations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    publication_id UUID REFERENCES publications(id) ON DELETE CASCADE,
+    audience_level audience_level_enum NOT NULL,
+    asset_type asset_type_enum NOT NULL,
+    generation_url TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 4. Comments Table
+CREATE TABLE comments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    generation_id UUID REFERENCES generations(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    comment_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+```
+
+---
+
+## 4. UI/UX View Architecture
+
+### View A: Main Dashboard (`/workspace`)
+
+A single clean screen split into an Input Form (Top/Collapsible) and a Main Data Table.
+
+1. **Input Component (Restricted to Admins/Creators):**
+* **Field 1:** Publication PDF (File Upload/URL string, auto-populates 'Publication Name').
+* **Field 2:** Audience Level (Dropdown select: Doctor, HCP, Professional, etc.).
+* **Field 3:** Generation Type (Dropdown select: Video, PPT, Poster).
+* **Field 4:** Generation Link (URL input field pointing to the completed asset file).
+* **Submit Button:** Writes records to `publications` and `generations` tables, then refreshes the table views.
+
+
+2. **The Workspace Table:**
+* Columns: `Publication Name` | `Audience` | `Asset Type` | `Action Button` | `Comment Status`.
+* The Action Button says **"🔍 Review Asset"**. Clicking it routes the user to the Split-Screen Studio View.
+
+
+
+---
+
+### View B: The Split-Screen Studio View (`/review/:generation_id`)
+
+When a user clicks "Review Asset", load a high-productivity 3-panel split screen layout (`grid grid-cols-12 h-screen`):
+
+1. **Left Panel (Width: 40% / Column Span 5): Source PDF Viewer**
+* Embed a scrollable PDF reader containing the original paper via standard `<iframe src={publication.pdf_url} width="100%" height="100%" />` or an optimized PDF worker library.
+
+
+2. **Middle Panel (Width: 40% / Column Span 5): Asset Player/Viewer**
+* Dynamic render block based on `generations.asset_type`:
+* If `Video`: Render a native HTML5 video player with playback controls.
+* If `PPT`: Embed via an Office Web Viewer/Google Docs iframe iframe, or render slide images using a carousel slider component.
+* If `Poster`: Render an interactive, zoom-and-pan-enabled High-Resolution Image Container.
+
+
+
+
+3. **Right Panel (Width: 20% / Column Span 2): Collapsible Comment Drawer**
+* A vertical chat/feed container displaying all comment history linked to this specific `generation_id`.
+* Displays: User badge, timestamp, and message body.
+* Bottom input box: A fixed text area allowing any logged-in user to submit a new comment. Submitting triggers an immediate layout refresh of the comment column.
+
+
+
+---
+
+## 5. API Endpoints Required (FastAPI )
+
+Implement these endpoints to handle the data workflow:
+
+* `POST /auth/login` - Validates credentials and returns a JWT token.
+* `GET /workspace/assets` - Fetch all combined table rows (via SQL `JOIN` across publications and generations).
+* `POST /workspace/assets` - Insert a new publication reference and its corresponding generation link.
+* `GET /review/{generation_id}` - Fetch specific publication URL, asset URL, type, and associated comments.
+* `POST /review/{generation_id}/comments` - Append a new user comment string to the database.
+
+Please write clean, modular code implementing the frontend views, database configurations, and backend endpoints described above. Ensure the design is responsive, accessible, and optimized for side-by-side medical asset verification.
+
+```
+
+```

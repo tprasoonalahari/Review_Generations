@@ -1,0 +1,82 @@
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from sqlalchemy.orm import Session
+from app import schemas, models, database
+from app.routers.auth import get_current_user
+from typing import List
+import shutil
+import os
+from uuid import uuid4
+from app.core.config import settings
+
+router = APIRouter(prefix="/workspace", tags=["workspace"])
+
+os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+
+@router.get("/assets")
+def get_assets(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    # Returns combined data: Publications and their Generations
+    publications = db.query(models.Publication).all()
+    result = []
+    for pub in publications:
+        for gen in pub.generations:
+            result.append({
+                "publication_id": pub.id,
+                "publication_title": pub.title,
+                "pdf_url": pub.pdf_url,
+                "generation_id": gen.id,
+                "audience_level": gen.audience_level,
+                "asset_type": gen.asset_type,
+                "generation_url": gen.generation_url,
+                "created_at": gen.created_at
+            })
+    return result
+
+@router.post("/assets")
+def create_asset(
+    title: str = Form(...),
+    audience_level: models.AudienceLevel = Form(...),
+    asset_type: models.AssetType = Form(...),
+    pdf_file: UploadFile = File(...),
+    asset_file: UploadFile = File(...),
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if current_user.role not in ['admin', 'creator']:
+        raise HTTPException(status_code=403, detail="Not authorized to create assets")
+    
+    # Save PDF
+    pdf_filename = f"{uuid4()}_{pdf_file.filename}"
+    pdf_path = os.path.join(settings.UPLOAD_DIR, pdf_filename)
+    with open(pdf_path, "wb") as buffer:
+        shutil.copyfileobj(pdf_file.file, buffer)
+        
+    # Save Asset File
+    asset_filename = f"{uuid4()}_{asset_file.filename}"
+    asset_path = os.path.join(settings.UPLOAD_DIR, asset_filename)
+    with open(asset_path, "wb") as buffer:
+        shutil.copyfileobj(asset_file.file, buffer)
+        
+    # Create DB records
+    pdf_url = f"/uploads/{pdf_filename}"
+    generation_url = f"/uploads/{asset_filename}"
+    
+    new_pub = models.Publication(
+        title=title,
+        pdf_url=pdf_url,
+        uploaded_by=current_user.id
+    )
+    db.add(new_pub)
+    db.commit()
+    db.refresh(new_pub)
+    
+    new_gen = models.Generation(
+        publication_id=new_pub.id,
+        audience_level=audience_level,
+        asset_type=asset_type,
+        generation_url=generation_url
+    )
+    db.add(new_gen)
+    db.commit()
+    db.refresh(new_gen)
+    
+    return {"message": "Asset created successfully", "publication_id": new_pub.id, "generation_id": new_gen.id}

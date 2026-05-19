@@ -1,0 +1,229 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import api from '../api/axios';
+import { ArrowLeft, Send } from 'lucide-react';
+
+interface Comment {
+  id: string;
+  text: string;
+  user: string;
+  created_at: string;
+}
+
+interface GenerationData {
+  publication: {
+    title: string;
+    pdf_url: string;
+  };
+  generation: {
+    id: string;
+    audience_level: string;
+    asset_type: string;
+    generation_url: string;
+  };
+  comments: Comment[];
+}
+
+const StudioView: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [data, setData] = useState<GenerationData | null>(null);
+  const [newComment, setNewComment] = useState('');
+  const [loading, setLoading] = useState(true);
+  const commentsEndRef = useRef<HTMLDivElement>(null);
+  const iframeContainerRef = useRef<HTMLDivElement>(null);
+
+  const fetchData = async () => {
+    try {
+      const response = await api.get(`/review/${id}`);
+      setData(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [id]);
+
+  useEffect(() => {
+    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [data?.comments]);
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+
+    try {
+      await api.post(`/review/${id}/comments`, { comment_text: newComment });
+      setNewComment('');
+      fetchData();
+    } catch (error) {
+      console.error('Error posting comment:', error);
+    }
+  };
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      iframeContainerRef.current?.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+
+  if (loading) {
+    return <div className="h-screen bg-slate-900 flex items-center justify-center text-white">Loading Studio...</div>;
+  }
+
+  if (!data) {
+    return <div className="h-screen bg-slate-900 flex items-center justify-center text-white">Asset not found.</div>;
+  }
+
+  const renderAssetPlayer = () => {
+    const url = `http://localhost:8000${data.generation.generation_url}`;
+    const type = data.generation.asset_type;
+
+    if (type === 'Video' || url.endsWith('.mp4')) {
+      return (
+        <video controls className="w-full h-full object-contain bg-black">
+          <source src={url} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      );
+    } else if (url.endsWith('.mp3')) {
+      return (
+        <div className="flex items-center justify-center h-full bg-slate-800">
+          <audio controls className="w-full max-w-md">
+            <source src={url} type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      );
+    } else if (type === 'Poster' || type === 'Infographic' || url.match(/\.(jpeg|jpg|gif|png)$/) != null) {
+      return (
+        <div className="w-full h-full overflow-auto flex items-center justify-center bg-slate-800">
+          <img src={url} alt="Generated Asset" className="max-w-full max-h-full object-contain" />
+        </div>
+      );
+    } else {
+      // For PPT or other unrenderable files natively, provide a Google Docs Viewer iframe + separate buttons
+      const googleDocsViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
+      
+      return (
+        <div className="flex flex-col h-full bg-slate-800 text-slate-300" ref={iframeContainerRef}>
+          <div className="flex-1 relative w-full bg-white">
+            <iframe 
+              src={googleDocsViewerUrl}
+              className="w-full h-full border-0 absolute top-0 left-0"
+              title="Asset Preview"
+            />
+          </div>
+          <div className="p-4 bg-slate-900 border-t border-slate-700 flex flex-wrap justify-between items-center shrink-0">
+            <div className="text-xs text-slate-400 max-w-sm">
+              Note: Preview uses Google Docs Viewer. The asset URL must be publicly accessible (not localhost) for the preview to load.
+            </div>
+            <div className="flex gap-3">
+              <button onClick={toggleFullscreen} className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded text-sm transition-colors cursor-pointer">
+                View Fullscreen
+              </button>
+              <a href={url} download target="_blank" rel="noopener noreferrer" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm transition-colors">
+                Download Asset
+              </a>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div className="h-screen flex flex-col bg-slate-900 text-slate-300 overflow-hidden">
+      {/* Header */}
+      <header className="h-14 border-b border-slate-700 bg-slate-800 flex items-center px-4 justify-between shrink-0">
+        <div className="flex items-center gap-4">
+          <button onClick={() => navigate('/workspace')} className="text-slate-400 hover:text-white transition-colors">
+            <ArrowLeft size={20} />
+          </button>
+          <div>
+            <h1 className="text-white font-semibold truncate max-w-xl">{data.publication.title}</h1>
+            <div className="text-xs text-slate-400 flex gap-2">
+              <span>{data.generation.asset_type}</span> &bull; <span>{data.generation.audience_level}</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Grid Grid */}
+      <div className="flex-1 grid grid-cols-12 h-[calc(100vh-3.5rem)]">
+        {/* Left Panel - PDF Viewer (Col span 5) */}
+        <div className="col-span-5 border-r border-slate-700 bg-slate-800 flex flex-col h-full">
+          <div className="px-4 py-2 bg-slate-800/80 border-b border-slate-700 text-sm font-semibold sticky top-0">Source Reference (PDF)</div>
+          <div className="flex-1 p-2 bg-slate-900 h-full">
+            <iframe 
+              src={`http://localhost:8000${data.publication.pdf_url}`} 
+              className="w-full h-full border-0 bg-white rounded"
+              title="PDF Viewer"
+            />
+          </div>
+        </div>
+
+        {/* Middle Panel - Asset Viewer (Col span 5) */}
+        <div className="col-span-5 border-r border-slate-700 bg-slate-900 flex flex-col h-full">
+          <div className="px-4 py-2 bg-slate-800/80 border-b border-slate-700 text-sm font-semibold sticky top-0 flex justify-between items-center">
+            <span>Generated Asset</span>
+            <a href={`http://localhost:8000${data.generation.generation_url}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs">Open Original</a>
+          </div>
+          <div className="flex-1 overflow-hidden h-full">
+            {renderAssetPlayer()}
+          </div>
+        </div>
+
+        {/* Right Panel - Comments (Col span 2) */}
+        <div className="col-span-2 bg-slate-800 flex flex-col h-full">
+          <div className="px-4 py-2 bg-slate-800/80 border-b border-slate-700 text-sm font-semibold sticky top-0">Review Comments</div>
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+            {data.comments.length === 0 ? (
+              <p className="text-slate-500 text-sm text-center mt-4">No comments yet. Start the review!</p>
+            ) : (
+              data.comments.map(comment => (
+                <div key={comment.id} className="bg-slate-700/50 p-3 rounded-lg text-sm border border-slate-700">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-semibold text-blue-400 truncate w-3/4">{comment.user}</span>
+                    <span className="text-xs text-slate-500">{new Date(comment.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <p className="text-slate-200 break-words">{comment.text}</p>
+                </div>
+              ))
+            )}
+            <div ref={commentsEndRef} />
+          </div>
+          <div className="p-4 bg-slate-800 border-t border-slate-700 shrink-0">
+            <form onSubmit={handleCommentSubmit} className="flex gap-2">
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Add comment..."
+                className="flex-1 bg-slate-900 border border-slate-600 rounded-l px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+              />
+              <button 
+                type="submit" 
+                disabled={!newComment.trim()}
+                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-3 py-2 rounded-r flex items-center justify-center transition-colors"
+              >
+                <Send size={16} />
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default StudioView;
