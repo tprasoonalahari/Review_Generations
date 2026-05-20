@@ -1,8 +1,6 @@
-
-
 from sqlalchemy import Column, String, Text, ForeignKey, DateTime, Enum, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 import uuid
 from app.database import Base
 import enum
@@ -62,8 +60,10 @@ class Comment(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     generation_id = Column(UUID(as_uuid=True), ForeignKey('generations.id', ondelete='CASCADE'))
     user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='SET NULL'))
+    parent_id = Column(UUID(as_uuid=True), ForeignKey('comments.id', ondelete='CASCADE'), nullable=True)
     comment_text = Column(Text, nullable=False)
     created_at = Column(DateTime, default=func.now())
     
     generation = relationship("Generation", back_populates="comments")
     user = relationship("User", back_populates="comments")
+    replies = relationship("Comment", backref=backref('parent', remote_side=[id]), cascade="all, delete-orphan")

@@ -11,6 +11,9 @@ try:
         print("Adding column uploaded_by to generations...")
         conn.execute(text("ALTER TABLE generations ADD COLUMN IF NOT EXISTS uploaded_by VARCHAR DEFAULT 'Unknown';"))
         
+        print("Adding column parent_id to comments...")
+        conn.execute(text("ALTER TABLE comments ADD COLUMN IF NOT EXISTS parent_id UUID REFERENCES comments(id) ON DELETE CASCADE;"))
+        
         print("Adding new values to audiencelevel enum...")
         # Postgres Enum modification cannot be run in a transaction block with other statements easily in older versions, 
         # but execution with AUTOCOMMIT is safest.

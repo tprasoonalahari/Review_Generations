@@ -30,12 +30,13 @@ class CommentBase(BaseModel):
     comment_text: str
 
 class CommentCreate(CommentBase):
-    pass
+    parent_id: Optional[UUID] = None
 
 class CommentResponse(CommentBase):
     id: UUID
     generation_id: UUID
     user_id: Optional[UUID]
+    parent_id: Optional[UUID] = None
     created_at: datetime
     user: Optional[UserResponse] = None
     

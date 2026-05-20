@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 
 interface Comment {
   id: string;
+  parent_id?: string | null;
   text: string;
   user: string;
   created_at: string;
@@ -41,6 +42,9 @@ const StudioView: React.FC = () => {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
 
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+
   const startEditing = (commentId: string, text: string) => {
     setEditingCommentId(commentId);
     setEditingText(text);
@@ -70,6 +74,23 @@ const StudioView: React.FC = () => {
       fetchData();
     } catch (error) {
       console.error('Error deleting comment:', error);
+    }
+  };
+
+  const handleReplySubmit = async (e: React.FormEvent, parentId: string) => {
+    e.preventDefault();
+    if (!replyText.trim()) return;
+
+    try {
+      await api.post(`/review/${id}/comments`, { 
+        comment_text: replyText,
+        parent_id: parentId 
+      });
+      setReplyText('');
+      setReplyingToId(null);
+      fetchData();
+    } catch (error) {
+      console.error('Error posting reply:', error);
     }
   };
 
@@ -265,62 +286,175 @@ const StudioView: React.FC = () => {
             {data.comments.length === 0 ? (
               <p className="text-text-muted text-sm text-center mt-8 italic">No comments yet. Start the review!</p>
             ) : (
-              data.comments.map(comment => (
-                <div key={comment.id} className="bg-slate-50 p-4 rounded-md rounded-tl-sm text-sm border border-slate-100 shadow-sm group/comment">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-bold text-primary truncate w-[55%]" title={comment.user}>{comment.user}</span>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="text-xs text-text-muted font-medium">{new Date(comment.created_at).toLocaleDateString()}</span>
-                      {(user?.email === comment.user || user?.role === 'admin') && (
-                        <div className="flex items-center gap-1 ml-1 opacity-0 group-hover/comment:opacity-100 transition-opacity">
-                          {user?.email === comment.user && (
-                            <button 
-                              onClick={() => startEditing(comment.id, comment.text)}
-                              className="text-text-muted hover:text-primary transition-colors p-0.5 rounded hover:bg-slate-200/50"
-                              title="Edit Comment"
-                            >
-                              <Edit2 size={13} />
-                            </button>
-                          )}
-                          <button 
-                            onClick={() => handleDeleteComment(comment.id)}
-                            className="text-text-muted hover:text-red-500 transition-colors p-0.5 rounded hover:bg-slate-200/50"
-                            title="Delete Comment"
-                          >
-                            <Trash2 size={13} />
-                          </button>
+              data.comments
+                .filter(comment => !comment.parent_id)
+                .map(rootComment => {
+                  const replies = data.comments.filter(reply => reply.parent_id === rootComment.id);
+                  return (
+                    <div key={rootComment.id} className="bg-slate-50 p-4 rounded-md text-sm border border-slate-200 shadow-sm flex flex-col gap-3 group/comment">
+                      {/* Root Comment content */}
+                      <div>
+                        <div className="flex justify-between items-center mb-1.5">
+                          <span className="font-bold text-primary truncate w-[55%]" title={rootComment.user}>{rootComment.user}</span>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="text-xs text-text-muted font-medium">{new Date(rootComment.created_at).toLocaleDateString()}</span>
+                            {(user?.email === rootComment.user || user?.role === 'admin') && (
+                              <div className="flex items-center gap-1 ml-1 opacity-0 group-hover/comment:opacity-100 transition-opacity">
+                                {user?.email === rootComment.user && (
+                                  <button 
+                                    onClick={() => startEditing(rootComment.id, rootComment.text)}
+                                    className="text-text-muted hover:text-primary transition-colors p-0.5 rounded hover:bg-slate-200/50"
+                                    title="Edit Comment"
+                                  >
+                                    <Edit2 size={13} />
+                                  </button>
+                                )}
+                                <button 
+                                  onClick={() => handleDeleteComment(rootComment.id)}
+                                  className="text-text-muted hover:text-red-500 transition-colors p-0.5 rounded hover:bg-slate-200/50"
+                                  title="Delete Comment"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {editingCommentId === rootComment.id ? (
+                          <div className="mt-2 flex flex-col gap-2">
+                            <textarea
+                              value={editingText}
+                              onChange={(e) => setEditingText(e.target.value)}
+                              className="w-full p-2 border border-border rounded-md bg-white text-sm text-text focus:outline-none focus:ring-1 focus:ring-primary"
+                              rows={2}
+                            />
+                            <div className="flex justify-end gap-2">
+                              <button 
+                                onClick={cancelEditing} 
+                                className="px-2.5 py-1 text-xs border border-border rounded text-text-muted hover:bg-white transition-colors"
+                              >
+                                Cancel
+                              </button>
+                              <button 
+                                onClick={() => handleUpdateComment(rootComment.id)} 
+                                className="px-2.5 py-1 text-xs bg-primary text-white rounded hover:bg-primary-hover transition-colors font-semibold"
+                              >
+                                Save
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <p className="text-text break-words leading-relaxed whitespace-pre-wrap">{rootComment.text}</p>
+                            <div className="mt-1.5 flex gap-3">
+                              <button 
+                                onClick={() => {
+                                  setReplyingToId(rootComment.id);
+                                  setReplyText('');
+                                }}
+                                className="text-xs text-primary/80 hover:text-primary font-semibold transition-colors"
+                              >
+                                Reply
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Nested Replies */}
+                      {replies.length > 0 && (
+                        <div className="flex flex-col gap-2.5 mt-1 pl-3 border-l-2 border-slate-200">
+                          {replies.map(reply => (
+                            <div key={reply.id} className="bg-white p-3 rounded-md border border-slate-100 shadow-2xs group/reply">
+                              <div className="flex justify-between items-center mb-1">
+                                <span className="font-bold text-text-muted text-xs truncate w-[50%]" title={reply.user}>{reply.user}</span>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <span className="text-[10px] text-text-muted/70">{new Date(reply.created_at).toLocaleDateString()}</span>
+                                  {(user?.email === reply.user || user?.role === 'admin') && (
+                                    <div className="flex items-center gap-0.5 ml-1 opacity-0 group-hover/reply:opacity-100 transition-opacity">
+                                      {user?.email === reply.user && (
+                                        <button 
+                                          onClick={() => startEditing(reply.id, reply.text)}
+                                          className="text-text-muted hover:text-primary transition-colors p-0.5 rounded hover:bg-slate-100"
+                                          title="Edit Reply"
+                                        >
+                                          <Edit2 size={11} />
+                                        </button>
+                                      )}
+                                      <button 
+                                        onClick={() => handleDeleteComment(reply.id)}
+                                        className="text-text-muted hover:text-red-500 transition-colors p-0.5 rounded hover:bg-slate-100"
+                                        title="Delete Reply"
+                                      >
+                                        <Trash2 size={11} />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {editingCommentId === reply.id ? (
+                                <div className="mt-1.5 flex flex-col gap-1.5">
+                                  <textarea
+                                    value={editingText}
+                                    onChange={(e) => setEditingText(e.target.value)}
+                                    className="w-full p-2 border border-border rounded-md bg-white text-xs text-text focus:outline-none focus:ring-1 focus:ring-primary"
+                                    rows={2}
+                                  />
+                                  <div className="flex justify-end gap-1.5">
+                                    <button 
+                                      onClick={cancelEditing} 
+                                      className="px-2 py-0.5 text-[10px] border border-border rounded text-text-muted hover:bg-slate-50 transition-colors"
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button 
+                                      onClick={() => handleUpdateComment(reply.id)} 
+                                      className="px-2 py-0.5 text-[10px] bg-primary text-white rounded hover:bg-primary-hover transition-colors font-semibold"
+                                    >
+                                      Save
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <p className="text-text text-xs break-words leading-relaxed whitespace-pre-wrap">{reply.text}</p>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       )}
+
+                      {/* Reply Input Form inline */}
+                      {replyingToId === rootComment.id && (
+                        <form onSubmit={(e) => handleReplySubmit(e, rootComment.id)} className="flex gap-1.5 mt-1 pt-1.5 border-t border-slate-100">
+                          <input
+                            type="text"
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder="Write a reply..."
+                            className="flex-1 bg-white border border-border rounded-md px-3 py-1.5 text-xs text-text focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                            autoFocus
+                          />
+                          <button 
+                            type="submit" 
+                            disabled={!replyText.trim()}
+                            className="bg-primary hover:bg-primary-hover disabled:opacity-50 text-white px-2.5 py-1.5 rounded-md text-xs font-semibold shadow-2xs transition-colors"
+                          >
+                            Reply
+                          </button>
+                          <button 
+                            type="button" 
+                            onClick={() => setReplyingToId(null)}
+                            className="border border-border text-text-muted hover:bg-slate-100 px-2 py-1.5 rounded-md text-xs transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </form>
+                      )}
                     </div>
-                  </div>
-                  {editingCommentId === comment.id ? (
-                    <div className="mt-2 flex flex-col gap-2">
-                      <textarea
-                        value={editingText}
-                        onChange={(e) => setEditingText(e.target.value)}
-                        className="w-full p-2 border border-border rounded-md bg-white text-sm text-text focus:outline-none focus:ring-1 focus:ring-primary"
-                        rows={2}
-                      />
-                      <div className="flex justify-end gap-2">
-                        <button 
-                          onClick={cancelEditing} 
-                          className="px-2.5 py-1 text-xs border border-border rounded text-text-muted hover:bg-white transition-colors"
-                        >
-                          Cancel
-                        </button>
-                        <button 
-                          onClick={() => handleUpdateComment(comment.id)} 
-                          className="px-2.5 py-1 text-xs bg-primary text-white rounded hover:bg-primary-hover transition-colors font-semibold"
-                        >
-                          Save
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-text break-words leading-relaxed whitespace-pre-wrap">{comment.text}</p>
-                  )}
-                </div>
-              ))
+                  );
+                })
             )}
           </div>
           <div className="p-4 bg-white border-t border-border shrink-0">

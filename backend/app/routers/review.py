@@ -26,6 +26,7 @@ def get_review_data(generation_id: UUID, db: Session = Depends(database.get_db),
         "comments": [
             {
                 "id": c.id,
+                "parent_id": c.parent_id,
                 "text": c.comment_text,
                 "created_at": c.created_at,
                 "user": c.user.email if c.user else "Unknown"
@@ -42,7 +43,8 @@ def add_comment(generation_id: UUID, comment: schemas.CommentCreate, db: Session
     new_comment = models.Comment(
         generation_id=generation_id,
         user_id=current_user.id,
-        comment_text=comment.comment_text
+        comment_text=comment.comment_text,
+        parent_id=comment.parent_id
     )
     db.add(new_comment)
     db.commit()
