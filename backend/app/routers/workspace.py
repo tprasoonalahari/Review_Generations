@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app import schemas, models, database
 from app.routers.auth import get_current_user
 from typing import List
@@ -17,7 +17,7 @@ if settings.GOOGLE_APPLICATION_CREDENTIALS:
 @router.get("/assets")
 def get_assets(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     # Returns combined data: Publications and their Generations
-    publications = db.query(models.Publication).all()
+    publications = db.query(models.Publication).options(joinedload(models.Publication.generations)).all()
     result = []
     for pub in publications:
         for gen in pub.generations:

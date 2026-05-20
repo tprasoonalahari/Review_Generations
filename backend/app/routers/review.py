@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app import schemas, models, database
 from app.routers.auth import get_current_user
 from uuid import UUID
@@ -8,7 +8,13 @@ router = APIRouter(prefix="/review", tags=["review"])
 
 @router.get("/{generation_id}")
 def get_review_data(generation_id: UUID, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
-    generation = db.query(models.Generation).filter(models.Generation.id == generation_id).first()
+    generation = db.query(models.Generation)\
+        .filter(models.Generation.id == generation_id)\
+        .options(
+            joinedload(models.Generation.publication),
+            joinedload(models.Generation.comments).joinedload(models.Comment.user)
+        )\
+        .first()
     if not generation:
         raise HTTPException(status_code=404, detail="Generation not found")
     
