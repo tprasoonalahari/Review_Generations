@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
+import { Eye, EyeOff } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -9,11 +10,21 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [role, setRole] = useState('viewer');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const handleToggleMode = (registering: boolean) => {
+    setIsRegistering(registering);
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+    setError('');
+    setSuccess('');
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,13 +34,13 @@ const Login: React.FC = () => {
       const formData = new URLSearchParams();
       formData.append('username', email);
       formData.append('password', password);
-      formData.append('client_id', name || 'User'); // Using client_id to pass name since it's supported by OAuth2 form
+      formData.append('client_id', name || 'User');
       
       const response = await api.post('/auth/login', formData, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       });
       
-      login(response.data.access_token, { email, role: 'viewer' }); // Role will be updated by JWT decode
+      login(response.data.access_token, { email, role: 'viewer' });
       navigate('/workspace');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Invalid credentials');
@@ -56,6 +67,8 @@ const Login: React.FC = () => {
       setIsRegistering(false);
       setPassword('');
       setConfirmPassword('');
+      setShowPassword(false);
+      setShowConfirmPassword(false);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed');
     }
@@ -95,25 +108,43 @@ const Login: React.FC = () => {
             </div>
             <div className="mb-5">
               <label className="block text-text-muted text-sm font-semibold mb-2">Password</label>
-              <input 
-                type="password" 
-                className="w-full px-4 py-3 bg-background/50 text-text border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative">
+                <input 
+                  type={showPassword ? 'text' : 'password'} 
+                  className="w-full pl-4 pr-12 py-3 bg-background/50 text-text border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors cursor-pointer flex items-center justify-center p-1.5 rounded-md hover:bg-background/80"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             <div className="mb-5">
               <label className="block text-text-muted text-sm font-semibold mb-2">Confirm Password</label>
-              <input 
-                type="password" 
-                className="w-full px-4 py-3 bg-background/50 text-text border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative">
+                <input 
+                  type={showConfirmPassword ? 'text' : 'password'} 
+                  className="w-full pl-4 pr-12 py-3 bg-background/50 text-text border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors cursor-pointer flex items-center justify-center p-1.5 rounded-md hover:bg-background/80"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             <div className="mb-8">
               <label className="block text-text-muted text-sm font-semibold mb-2">Role</label>
@@ -135,11 +166,7 @@ const Login: React.FC = () => {
               <button 
                 type="button" 
                 className="text-primary font-semibold hover:underline cursor-pointer"
-                onClick={() => {
-                  setIsRegistering(false);
-                  setError('');
-                  setSuccess('');
-                }}
+                onClick={() => handleToggleMode(false)}
               >
                 Log in
               </button>
@@ -171,14 +198,23 @@ const Login: React.FC = () => {
             </div>
             <div className="mb-8">
               <label className="block text-text-muted text-sm font-semibold mb-2">Password</label>
-              <input 
-                type="password" 
-                className="w-full px-4 py-3 bg-background/50 text-text border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative">
+                <input 
+                  type={showPassword ? 'text' : 'password'} 
+                  className="w-full pl-4 pr-12 py-3 bg-background/50 text-text border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors cursor-pointer flex items-center justify-center p-1.5 rounded-md hover:bg-background/80"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             <button type="submit" className="w-full bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 cursor-pointer">
               Login
@@ -188,11 +224,7 @@ const Login: React.FC = () => {
               <button 
                 type="button" 
                 className="text-primary font-semibold hover:underline cursor-pointer"
-                onClick={() => {
-                  setIsRegistering(true);
-                  setError('');
-                  setSuccess('');
-                }}
+                onClick={() => handleToggleMode(true)}
               >
                 Sign up
               </button>
