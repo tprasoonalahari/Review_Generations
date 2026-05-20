@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { ArrowLeft, Send, X, FileText } from 'lucide-react';
+import { ArrowLeft, Send, X, FileText, Edit2, Trash2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 interface Comment {
   id: string;
@@ -29,12 +30,48 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const StudioView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [data, setData] = useState<GenerationData | null>(null);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
   const commentsEndRef = useRef<HTMLDivElement>(null);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
   const [isPdfOpen, setIsPdfOpen] = useState(true);
+
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState('');
+
+  const startEditing = (commentId: string, text: string) => {
+    setEditingCommentId(commentId);
+    setEditingText(text);
+  };
+
+  const cancelEditing = () => {
+    setEditingCommentId(null);
+    setEditingText('');
+  };
+
+  const handleUpdateComment = async (commentId: string) => {
+    if (!editingText.trim()) return;
+    try {
+      await api.put(`/review/comments/${commentId}`, { comment_text: editingText });
+      setEditingCommentId(null);
+      setEditingText('');
+      fetchData();
+    } catch (error) {
+      console.error('Error updating comment:', error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!window.confirm('Are you sure you want to delete this comment?')) return;
+    try {
+      await api.delete(`/review/comments/${commentId}`);
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -185,10 +222,10 @@ const StudioView: React.FC = () => {
       </header>
 
       {/* Main Grid Grid */}
-      <div className="flex-1 grid grid-cols-12 h-[calc(100vh-4rem)] bg-background">
+      <div className="flex-1 grid grid-cols-12 gap-6 h-[calc(100vh-4rem)] p-6 bg-background">
         {/* Left Panel - PDF Viewer (Col span 5) */}
         {isPdfOpen && (
-          <div className="col-span-5 bg-background flex flex-col h-full p-6">
+          <div className="col-span-5 flex flex-col h-full">
             <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted flex justify-between items-center">
               <span>Source Reference (PDF)</span>
               <button onClick={() => setIsPdfOpen(false)} className="text-text-muted hover:text-text transition-colors" title="Close PDF Panel">
@@ -206,7 +243,7 @@ const StudioView: React.FC = () => {
         )}
 
         {/* Middle Panel - Asset Viewer */}
-        <div className={`${isPdfOpen ? 'col-span-5' : 'col-span-10'} bg-background flex flex-col h-full p-6 ${isPdfOpen ? 'pl-0' : ''}`}>
+        <div className={`${isPdfOpen ? 'col-span-4' : 'col-span-9'} flex flex-col h-full`}>
           <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted flex justify-between items-center">
             <span>Generated Asset</span>
           </div>
@@ -215,8 +252,8 @@ const StudioView: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Panel - Comments (Col span 2) */}
-        <div className="col-span-2 bg-background flex flex-col h-full p-6 pl-0">
+        {/* Right Panel - Comments (Col span 3) */}
+        <div className="col-span-3 flex flex-col h-full">
           <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted">Review Comments</div>
           <div className="flex-1 bg-white rounded-md shadow-xl border border-border flex flex-col overflow-hidden">
             <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
@@ -224,12 +261,59 @@ const StudioView: React.FC = () => {
               <p className="text-text-muted text-sm text-center mt-8 italic">No comments yet. Start the review!</p>
             ) : (
               data.comments.map(comment => (
-                <div key={comment.id} className="bg-slate-50 p-4 rounded-md rounded-tl-sm text-sm border border-slate-100 shadow-sm">
+                <div key={comment.id} className="bg-slate-50 p-4 rounded-md rounded-tl-sm text-sm border border-slate-100 shadow-sm group/comment">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="font-bold text-primary truncate w-3/4">{comment.user}</span>
-                    <span className="text-xs text-text-muted font-medium">{new Date(comment.created_at).toLocaleDateString()}</span>
+                    <span className="font-bold text-primary truncate w-[55%]" title={comment.user}>{comment.user}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="text-xs text-text-muted font-medium">{new Date(comment.created_at).toLocaleDateString()}</span>
+                      {(user?.email === comment.user || user?.role === 'admin') && (
+                        <div className="flex items-center gap-1 ml-1 opacity-0 group-hover/comment:opacity-100 transition-opacity">
+                          {user?.email === comment.user && (
+                            <button 
+                              onClick={() => startEditing(comment.id, comment.text)}
+                              className="text-text-muted hover:text-primary transition-colors p-0.5 rounded hover:bg-slate-200/50"
+                              title="Edit Comment"
+                            >
+                              <Edit2 size={13} />
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => handleDeleteComment(comment.id)}
+                            className="text-text-muted hover:text-red-500 transition-colors p-0.5 rounded hover:bg-slate-200/50"
+                            title="Delete Comment"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-text break-words leading-relaxed">{comment.text}</p>
+                  {editingCommentId === comment.id ? (
+                    <div className="mt-2 flex flex-col gap-2">
+                      <textarea
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        className="w-full p-2 border border-border rounded-md bg-white text-sm text-text focus:outline-none focus:ring-1 focus:ring-primary"
+                        rows={2}
+                      />
+                      <div className="flex justify-end gap-2">
+                        <button 
+                          onClick={cancelEditing} 
+                          className="px-2.5 py-1 text-xs border border-border rounded text-text-muted hover:bg-white transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          onClick={() => handleUpdateComment(comment.id)} 
+                          className="px-2.5 py-1 text-xs bg-primary text-white rounded hover:bg-primary-hover transition-colors font-semibold"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-text break-words leading-relaxed whitespace-pre-wrap">{comment.text}</p>
+                  )}
                 </div>
               ))
             )}

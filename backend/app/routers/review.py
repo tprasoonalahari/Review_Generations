@@ -48,3 +48,28 @@ def add_comment(generation_id: UUID, comment: schemas.CommentCreate, db: Session
     db.commit()
     db.refresh(new_comment)
     return new_comment
+
+@router.put("/comments/{comment_id}", response_model=schemas.CommentResponse)
+def update_comment(comment_id: UUID, comment_update: schemas.CommentCreate, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    comment = db.query(models.Comment).filter(models.Comment.id == comment_id).first()
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    if comment.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You do not have permission to edit this comment")
+    
+    comment.comment_text = comment_update.comment_text
+    db.commit()
+    db.refresh(comment)
+    return comment
+
+@router.delete("/comments/{comment_id}")
+def delete_comment(comment_id: UUID, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    comment = db.query(models.Comment).filter(models.Comment.id == comment_id).first()
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    if comment.user_id != current_user.id and current_user.role != 'admin':
+        raise HTTPException(status_code=403, detail="You do not have permission to delete this comment")
+    
+    db.delete(comment)
+    db.commit()
+    return {"detail": "Comment deleted successfully"}
