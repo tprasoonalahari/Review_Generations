@@ -248,10 +248,10 @@ const StudioView: React.FC = () => {
       </header>
 
       {/* Main Grid Grid */}
-      <div className="flex-1 grid grid-cols-12 gap-6 h-[calc(100vh-4rem)] p-6 bg-background">
+      <div className="flex-1 min-h-0 grid grid-cols-12 gap-6 p-6 bg-background overflow-hidden">
         {/* Left Panel - PDF Viewer (Col span 5) */}
         {isPdfOpen && (
-          <div className="col-span-5 flex flex-col h-full">
+          <div className="col-span-5 flex flex-col h-full min-h-0 overflow-hidden">
             <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted flex justify-between items-center">
               <span>Source Reference (PDF)</span>
               <button onClick={() => setIsPdfOpen(false)} className="text-text-muted hover:text-text transition-colors" title="Close PDF Panel">
@@ -269,7 +269,7 @@ const StudioView: React.FC = () => {
         )}
 
         {/* Middle Panel - Asset Viewer */}
-        <div className={`${isPdfOpen ? 'col-span-4' : 'col-span-9'} flex flex-col h-full`}>
+        <div className={`${isPdfOpen ? 'col-span-4' : 'col-span-9'} flex flex-col h-full min-h-0 overflow-hidden`}>
           <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted flex justify-between items-center">
             <span>Generated Asset</span>
           </div>
@@ -279,7 +279,7 @@ const StudioView: React.FC = () => {
         </div>
 
         {/* Right Panel - Comments (Col span 3) */}
-        <div className="col-span-3 flex flex-col h-full">
+        <div className="col-span-3 flex flex-col h-full min-h-0 overflow-hidden">
           <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted">Review Comments</div>
           <div className="flex-1 bg-white rounded-md shadow-xl border border-border flex flex-col overflow-hidden">
             <div ref={commentsContainerRef} className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
