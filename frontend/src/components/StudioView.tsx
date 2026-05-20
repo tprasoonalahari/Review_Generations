@@ -34,7 +34,7 @@ const StudioView: React.FC = () => {
   const [data, setData] = useState<GenerationData | null>(null);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
-  const commentsEndRef = useRef<HTMLDivElement>(null);
+  const commentsContainerRef = useRef<HTMLDivElement>(null);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
   const [isPdfOpen, setIsPdfOpen] = useState(true);
 
@@ -89,7 +89,12 @@ const StudioView: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (commentsContainerRef.current) {
+      commentsContainerRef.current.scrollTo({
+        top: commentsContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   }, [data?.comments]);
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
@@ -256,7 +261,7 @@ const StudioView: React.FC = () => {
         <div className="col-span-3 flex flex-col h-full">
           <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted">Review Comments</div>
           <div className="flex-1 bg-white rounded-md shadow-xl border border-border flex flex-col overflow-hidden">
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
+            <div ref={commentsContainerRef} className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
             {data.comments.length === 0 ? (
               <p className="text-text-muted text-sm text-center mt-8 italic">No comments yet. Start the review!</p>
             ) : (
@@ -317,7 +322,6 @@ const StudioView: React.FC = () => {
                 </div>
               ))
             )}
-            <div ref={commentsEndRef} />
           </div>
           <div className="p-4 bg-white border-t border-border shrink-0">
             <form onSubmit={handleCommentSubmit} className="flex gap-2">
