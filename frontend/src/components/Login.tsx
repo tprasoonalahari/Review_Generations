@@ -78,7 +78,7 @@ const Login: React.FC = () => {
     <div className="flex h-screen items-center justify-center bg-background">
       <div className="w-full max-w-md p-10 bg-surface rounded-2xl shadow-2xl shadow-blue-900/5 border border-white">
         <h2 className="text-3xl font-extrabold text-center text-text mb-8 tracking-tight">
-          {isRegistering ? 'Create Account' : 'Review & Hub'}
+          {isRegistering ? 'Create Account' : 'Review Hub - Orakris'}
         </h2>
         
         {error && (

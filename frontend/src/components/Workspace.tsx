@@ -94,7 +94,7 @@ const Workspace: React.FC = () => {
     <div className="min-h-screen bg-background text-text p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#0B3C88] to-[#00B5FF] tracking-tight">Review & Hub Workspace</h1>
+          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#0B3C88] to-[#00B5FF] tracking-tight">Review Hub - Orakris</h1>
           <div className="flex gap-4">
             {(user?.role === 'admin' || user?.role === 'creator') && (
               <button 
