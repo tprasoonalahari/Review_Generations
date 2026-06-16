@@ -8,16 +8,24 @@ from uuid import UUID
 
 router = APIRouter(prefix="/slides", tags=["slides"])
 
-@router.get("", response_model=List[schemas.SlideSubmissionResponse])
+@router.get("")
 def get_slide_submissions(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
-    # Returns all slide submissions
+    # Returns all slide submissions with uploader info
     submissions = db.query(models.SlideSubmission).options(
-        joinedload(models.SlideSubmission.comments).joinedload(models.SlideComment.user)
+        joinedload(models.SlideSubmission.uploader)
     ).order_by(models.SlideSubmission.created_at.desc()).all()
     
-    # Map to schemas manually or let FastAPI handle it. 
-    # Since we have relationship backref, let's ensure it maps cleanly
-    return submissions
+    return [
+        {
+            "id": sub.id,
+            "title": sub.title,
+            "client_slide_url": sub.client_slide_url,
+            "production_slide_url": sub.production_slide_url,
+            "recreated_slide_url": sub.recreated_slide_url,
+            "uploaded_by": sub.uploader.email if sub.uploader else "Unknown",
+            "created_at": sub.created_at
+        } for sub in submissions
+    ]
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_slide_submission(
