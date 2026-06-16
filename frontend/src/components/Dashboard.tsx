@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { 
@@ -18,11 +18,20 @@ import {
 const Dashboard: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Stats
   const [assetCount, setAssetCount] = useState(0);
   const [slideCount, setSlideCount] = useState(0);
   const [loadingStats, setLoadingStats] = useState(true);
+
+  useEffect(() => {
+    if (location.state && (location.state as any).openUploadAsset) {
+      setShowAssetModal(true);
+      // Clear location state
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, navigate]);
 
   // Success Notification
   const [successMessage, setSuccessMessage] = useState('');
