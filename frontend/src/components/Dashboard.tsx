@@ -148,38 +148,37 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
-      {/* Background gradients for WOW aesthetics */}
-      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-[#0f244b] to-transparent pointer-events-none opacity-80" />
-      <div className="absolute top-[20%] right-[10%] w-[300px] h-[300px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[20%] left-[10%] w-[350px] h-[350px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen bg-background text-text flex flex-col font-sans relative">
+      {/* Dynamic background decoration in brand color */}
+      <div className="absolute top-0 left-0 w-full h-[320px] bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
+      <div className="absolute top-[10%] right-[5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Navigation Header */}
-      <header className="relative z-10 max-w-7xl mx-auto w-full px-6 py-5 flex justify-between items-center border-b border-slate-800">
+      <header className="relative z-10 max-w-7xl mx-auto w-full px-6 py-5 flex justify-between items-center border-b border-border bg-white/50 backdrop-blur-md rounded-b-2xl shadow-sm shadow-blue-900/5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <Layers className="text-white w-5 h-5 animate-pulse" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0B3C88] to-primary flex items-center justify-center shadow-md shadow-blue-950/10">
+            <Layers className="text-white w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300">
-              Orakris <span className="text-blue-400 font-semibold">Review Suite</span>
+            <h1 className="text-xl font-extrabold tracking-tight text-[#0B3C88]">
+              Orakris <span className="text-primary font-bold">Review Suite</span>
             </h1>
-            <p className="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Review & Verification Hub</p>
+            <p className="text-[10px] text-text-muted font-mono tracking-widest uppercase">Collaborative Workspace</p>
           </div>
         </div>
         
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2.5 px-4 py-1.5 bg-slate-800/80 border border-slate-700/60 rounded-full text-xs">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-slate-300">{user?.email}</span>
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-indigo-500/20 text-indigo-400 rounded-full border border-indigo-500/20">
+          <div className="flex items-center gap-2.5 px-4 py-1.5 bg-white border border-border rounded-full text-xs shadow-sm">
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span className="font-semibold text-text">{user?.email}</span>
+            <span className="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 bg-[#0B3C88]/10 text-[#0B3C88] rounded-full border border-[#0B3C88]/10">
               {user?.role}
             </span>
           </div>
           
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg hover:bg-slate-800/60 border border-transparent hover:border-slate-800"
+            className="flex items-center gap-1.5 text-xs text-text-muted hover:text-[#0B3C88] transition-colors py-1.5 px-3 rounded-xl hover:bg-white border border-transparent hover:border-border shadow-xs hover:shadow-sm"
           >
             <LogOut size={14} /> Logout
           </button>
@@ -190,10 +189,10 @@ const Dashboard: React.FC = () => {
       <main className="relative z-10 max-w-7xl mx-auto w-full px-6 py-12 flex-1 flex flex-col justify-center">
         {/* Welcome Section */}
         <div className="mb-14 text-center max-w-3xl mx-auto">
-          <h2 className="text-4xl font-extrabold tracking-tight text-white mb-4 sm:text-5xl leading-tight">
-            Welcome back to the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Review Hub</span>
+          <h2 className="text-4xl font-extrabold tracking-tight text-[#0B3C88] mb-4 sm:text-5xl leading-tight">
+            Welcome back to the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0B3C88] to-primary">Review Hub</span>
           </h2>
-          <p className="text-slate-400 text-lg leading-relaxed">
+          <p className="text-text-muted text-lg leading-relaxed">
             Verify multimodal generation output, review medical publication files, and compare presentation slides side-by-side. Select a workflow below to get started.
           </p>
         </div>
@@ -201,20 +200,20 @@ const Dashboard: React.FC = () => {
         {/* Dual Use Cases Grid */}
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           {/* Use Case 1: Multimodal Assets */}
-          <div className="group bg-slate-800/40 backdrop-blur-xl border border-slate-800/80 hover:border-blue-500/30 rounded-3xl p-8 shadow-xl hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-300 flex flex-col relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-[120px] h-[120px] bg-blue-500/5 rounded-bl-full pointer-events-none" />
+          <div className="group bg-surface border border-border hover:border-primary/40 rounded-3xl p-8 shadow-xl hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 flex flex-col relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-[120px] h-[120px] bg-primary/5 rounded-bl-full pointer-events-none" />
             
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
                 <FileText size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Multimodal Assets Suite</h3>
-                <p className="text-xs text-slate-400">Videos, PPTs, Posters & Infographics</p>
+                <h3 className="text-xl font-bold text-[#0B3C88]">Multimodal Assets Suite</h3>
+                <p className="text-xs text-text-muted">Videos, PPTs, Posters & Infographics</p>
               </div>
             </div>
 
-            <p className="text-slate-300 text-sm leading-relaxed mb-8 flex-1">
+            <p className="text-text-muted text-sm leading-relaxed mb-8 flex-1">
               Upload original publication research PDFs along with their generated multimodal output channels (like audience-specific landing videos, posters, or infographics). Perform targeted verification audits and comment directly on sections.
             </p>
 
@@ -222,43 +221,43 @@ const Dashboard: React.FC = () => {
               {(user?.role === 'admin' || user?.role === 'creator') && (
                 <button
                   onClick={() => setShowAssetModal(true)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-500/10 hover:-translate-y-0.5 transition-all duration-200"
+                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#0B3C88] to-primary hover:from-[#072758] hover:to-primary text-white font-bold py-3.5 px-4 rounded-xl shadow-md shadow-blue-950/10 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
                 >
                   <Upload size={16} /> Upload Asset
                 </button>
               )}
               <button
                 onClick={() => navigate('/workspace')}
-                className="flex-1 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold py-3.5 px-4 rounded-xl border border-slate-700 hover:border-slate-600 transition-all duration-200"
+                className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#0B3C88] font-bold py-3.5 px-4 rounded-xl border border-border hover:border-slate-300 transition-all duration-200 shadow-sm"
               >
                 <Search size={16} /> Review Asset
               </button>
             </div>
             
             {/* Stats Badge */}
-            <div className="mt-6 pt-5 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+            <div className="mt-6 pt-5 border-t border-border flex items-center justify-between text-xs text-text-muted">
               <span className="flex items-center gap-1.5"><CheckCircle size={14} className="text-emerald-500" /> Active Database Records</span>
-              <span className="font-mono bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/10">
+              <span className="font-mono bg-blue-50 text-[#0B3C88] px-3 py-1 rounded-full border border-blue-100 font-bold">
                 {loadingStats ? '...' : `${assetCount} Assets`}
               </span>
             </div>
           </div>
 
           {/* Use Case 2: Presentation Slides */}
-          <div className="group bg-slate-800/40 backdrop-blur-xl border border-slate-800/80 hover:border-indigo-500/30 rounded-3xl p-8 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/5 transition-all duration-300 flex flex-col relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-[120px] h-[120px] bg-indigo-500/5 rounded-bl-full pointer-events-none" />
+          <div className="group bg-surface border border-border hover:border-primary/40 rounded-3xl p-8 shadow-xl hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 flex flex-col relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-[120px] h-[120px] bg-primary/5 rounded-bl-full pointer-events-none" />
             
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center border border-cyan-100 group-hover:scale-105 transition-transform">
                 <Presentation size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Presentation Slide Hub</h3>
-                <p className="text-xs text-slate-400">Side-by-Side Presentation Checks</p>
+                <h3 className="text-xl font-bold text-[#0B3C88]">Presentation Slide Hub</h3>
+                <p className="text-xs text-text-muted">Side-by-Side Presentation Checks</p>
               </div>
             </div>
 
-            <p className="text-slate-300 text-sm leading-relaxed mb-8 flex-1">
+            <p className="text-text-muted text-sm leading-relaxed mb-8 flex-1">
               Upload Client Pitch slides, Production team decks, and Recreated master slide sets together in `.pptx` format. Review all three versions side-by-side concurrently to cross-compare and coordinate revision notes.
             </p>
 
@@ -266,23 +265,23 @@ const Dashboard: React.FC = () => {
               {(user?.role === 'admin' || user?.role === 'creator') && (
                 <button
                   onClick={() => setShowSlidesModal(true)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-500/10 hover:-translate-y-0.5 transition-all duration-200"
+                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary text-white font-bold py-3.5 px-4 rounded-xl shadow-md shadow-blue-500/10 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
                 >
                   <Plus size={16} /> Upload Slides
                 </button>
               )}
               <button
                 onClick={() => navigate('/review-slides')}
-                className="flex-1 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold py-3.5 px-4 rounded-xl border border-slate-700 hover:border-slate-600 transition-all duration-200"
+                className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#0B3C88] font-bold py-3.5 px-4 rounded-xl border border-border hover:border-slate-300 transition-all duration-200 shadow-sm"
               >
                 <Search size={16} /> Review Slides
               </button>
             </div>
 
             {/* Stats Badge */}
-            <div className="mt-6 pt-5 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-              <span className="flex items-center gap-1.5"><FileCheck size={14} className="text-indigo-400" /> Comparative Slide Submissions</span>
-              <span className="font-mono bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/10">
+            <div className="mt-6 pt-5 border-t border-border flex items-center justify-between text-xs text-text-muted">
+              <span className="flex items-center gap-1.5"><FileCheck size={14} className="text-primary" /> Comparative Slide Submissions</span>
+              <span className="font-mono bg-cyan-50 text-cyan-700 px-3 py-1 rounded-full border border-cyan-100 font-bold">
                 {loadingStats ? '...' : `${slideCount} Slide Sets`}
               </span>
             </div>
@@ -292,33 +291,33 @@ const Dashboard: React.FC = () => {
 
       {/* Asset Upload Modal */}
       {showAssetModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
-            <h3 className="text-2xl font-bold text-white mb-2">Upload Multimodal Asset</h3>
-            <p className="text-slate-400 text-xs mb-6">Create a database record mapping the publication reference to its asset.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-surface border border-border rounded-3xl w-full max-w-lg p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-2xl font-bold text-[#0B3C88] mb-2">Upload Multimodal Asset</h3>
+            <p className="text-text-muted text-xs mb-6">Create a database record mapping the publication reference to its asset.</p>
 
             {assetError && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg mb-4 text-xs font-semibold">
+              <div className="bg-red-500/10 border border-red-500/30 text-red-500 p-3 rounded-lg mb-4 text-xs font-semibold">
                 {assetError}
               </div>
             )}
 
             <form onSubmit={handleAssetSubmit} className="space-y-5">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Publication Title</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Publication Title</label>
                 <input 
                   type="text" required value={assetTitle} onChange={e => setAssetTitle(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm"
+                  className="w-full bg-white border border-border rounded-xl px-4 py-3 text-text placeholder-slate-400 focus:outline-none focus:border-primary text-sm shadow-xs"
                   placeholder="e.g. Clinical Trial Evaluation"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Audience Level</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Audience Level</label>
                   <select 
                     value={assetAudience} onChange={e => setAssetAudience(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-blue-500 text-sm"
+                    className="w-full bg-white border border-border rounded-xl px-4 py-3 text-text focus:outline-none focus:border-primary text-sm shadow-xs"
                   >
                     <option value="Field force">Field force</option>
                     <option value="MSLs">MSLs</option>
@@ -328,10 +327,10 @@ const Dashboard: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Asset Type</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Asset Type</label>
                   <select 
                     value={assetType} onChange={e => setAssetType(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-blue-500 text-sm"
+                    className="w-full bg-white border border-border rounded-xl px-4 py-3 text-text focus:outline-none focus:border-primary text-sm shadow-xs"
                   >
                     <option value="Video">Video</option>
                     <option value="PPT">PPT</option>
@@ -342,33 +341,33 @@ const Dashboard: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Source Publication (PDF)</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Source Publication (PDF)</label>
                 <input 
                   type="file" accept=".pdf" required onChange={e => setAssetPdfFile(e.target.files?.[0] || null)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-300 text-xs file:mr-4 file:py-1 file:px-3.5 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer"
+                  className="w-full bg-white border border-border rounded-xl px-4 py-2.5 text-text text-xs file:mr-4 file:py-1 file:px-3.5 file:rounded-lg file:border-0 file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer shadow-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Generated Asset File</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Generated Asset File</label>
                 <input 
                   type="file" required onChange={e => setAssetFile(e.target.files?.[0] || null)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-300 text-xs file:mr-4 file:py-1 file:px-3.5 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer"
+                  className="w-full bg-white border border-border rounded-xl px-4 py-2.5 text-text text-xs file:mr-4 file:py-1 file:px-3.5 file:rounded-lg file:border-0 file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer shadow-xs"
                 />
               </div>
 
-              <div className="flex gap-3 pt-4 border-t border-slate-800/80">
+              <div className="flex gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => { setShowAssetModal(false); setAssetError(''); }}
-                  className="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold transition-all text-sm"
+                  className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-text-muted font-bold transition-all text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={assetUploading}
-                  className="flex-1 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold shadow-lg shadow-blue-500/10 transition-all text-sm"
+                  className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-[#0B3C88] to-primary text-white font-bold shadow-md hover:shadow-lg transition-all text-sm"
                 >
                   {assetUploading ? 'Uploading...' : 'Submit Asset'}
                 </button>
@@ -380,63 +379,63 @@ const Dashboard: React.FC = () => {
 
       {/* Slides Upload Modal */}
       {showSlidesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
-            <h3 className="text-2xl font-bold text-white mb-2">Upload Slide Presentations</h3>
-            <p className="text-slate-400 text-xs mb-6">Select three PowerPoint files representing the client, team, and recreated master slides.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-surface border border-border rounded-3xl w-full max-w-lg p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-2xl font-bold text-[#0B3C88] mb-2">Upload Slide Presentations</h3>
+            <p className="text-text-muted text-xs mb-6">Select three PowerPoint files representing the client, team, and recreated master slides.</p>
 
             {slidesError && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg mb-4 text-xs font-semibold">
+              <div className="bg-red-500/10 border border-red-500/30 text-red-500 p-3 rounded-lg mb-4 text-xs font-semibold">
                 {slidesError}
               </div>
             )}
 
             <form onSubmit={handleSlidesSubmit} className="space-y-5">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Project / Slide Name</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Project / Slide Name</label>
                 <input 
                   type="text" required value={slidesTitle} onChange={e => setSlidesTitle(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
+                  className="w-full bg-white border border-border rounded-xl px-4 py-3 text-text placeholder-slate-400 focus:outline-none focus:border-primary text-sm shadow-xs"
                   placeholder="e.g. Q4 Executive Sales Review"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">1. Client Slide (.pptx only)</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1">1. Client Slide (.pptx only)</label>
                 <input 
                   type="file" accept=".pptx" required onChange={e => setClientSlideFile(e.target.files?.[0] || null)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-300 text-xs file:mr-4 file:py-1 file:px-3.5 file:rounded-lg file:border-0 file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer"
+                  className="w-full bg-white border border-border rounded-xl px-4 py-2.5 text-text text-xs file:mr-4 file:py-1 file:px-3.5 file:rounded-lg file:border-0 file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer shadow-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">2. Production Slide (.pptx only)</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1">2. Production Slide (.pptx only)</label>
                 <input 
                   type="file" accept=".pptx" required onChange={e => setProductionSlideFile(e.target.files?.[0] || null)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-300 text-xs file:mr-4 file:py-1 file:px-3.5 file:rounded-lg file:border-0 file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer"
+                  className="w-full bg-white border border-border rounded-xl px-4 py-2.5 text-text text-xs file:mr-4 file:py-1 file:px-3.5 file:rounded-lg file:border-0 file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer shadow-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">3. Recreated Slide (.pptx only)</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1">3. Recreated Slide (.pptx only)</label>
                 <input 
                   type="file" accept=".pptx" required onChange={e => setRecreatedSlideFile(e.target.files?.[0] || null)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-300 text-xs file:mr-4 file:py-1 file:px-3.5 file:rounded-lg file:border-0 file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer"
+                  className="w-full bg-white border border-border rounded-xl px-4 py-2.5 text-text text-xs file:mr-4 file:py-1 file:px-3.5 file:rounded-lg file:border-0 file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer shadow-xs"
                 />
               </div>
 
-              <div className="flex gap-3 pt-4 border-t border-slate-800/80">
+              <div className="flex gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => { setShowSlidesModal(false); setSlidesError(''); }}
-                  className="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold transition-all text-sm"
+                  className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-text-muted font-bold transition-all text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={slidesUploading}
-                  className="flex-1 py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold shadow-lg shadow-indigo-500/10 transition-all text-sm"
+                  className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary text-white font-bold shadow-md hover:shadow-lg transition-all text-sm"
                 >
                   {slidesUploading ? 'Uploading...' : 'Submit Slides'}
                 </button>
