@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
-import { Plus, Search, LogOut, Trash2, ArrowLeft } from 'lucide-react';
+import { Search, Trash2, ArrowLeft } from 'lucide-react';
 
 interface Asset {
   publication_id: string;
@@ -16,7 +16,7 @@ interface Asset {
 const Workspace: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [assetsLoading, setAssetsLoading] = useState(true);
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const fetchAssets = async () => {
@@ -34,11 +34,6 @@ const Workspace: React.FC = () => {
   useEffect(() => {
     fetchAssets();
   }, []);
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   const handleDelete = async (generationId: string) => {
     if (window.confirm('Are you sure you want to delete this asset?')) {
@@ -59,25 +54,12 @@ const Workspace: React.FC = () => {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate('/dashboard')} 
-              className="p-2.5 bg-white border border-border hover:bg-slate-50 text-text-muted hover:text-text rounded-xl shadow-sm transition-all"
+              className="p-2.5 bg-white border border-border hover:bg-slate-50 text-text-muted hover:text-text rounded-xl shadow-sm transition-all cursor-pointer"
               title="Back to Dashboard"
             >
               <ArrowLeft size={20} />
             </button>
             <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#0B3C88] to-[#00B5FF] tracking-tight">Review Hub - Orakris</h1>
-          </div>
-          <div className="flex gap-4">
-            {(user?.role === 'admin' || user?.role === 'creator') && (
-              <button 
-                onClick={() => navigate('/dashboard', { state: { openUploadAsset: true } })}
-                className="flex items-center gap-2 bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 font-semibold cursor-pointer"
-              >
-                <Plus size={20} /> Add New Asset
-              </button>
-            )}
-            <button onClick={handleLogout} className="flex items-center gap-2 text-text-muted hover:text-text transition-colors cursor-pointer">
-              <LogOut size={20} /> Logout
-            </button>
           </div>
         </div>
 
