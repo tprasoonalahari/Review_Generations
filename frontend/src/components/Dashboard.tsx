@@ -11,7 +11,8 @@ import {
   LogOut, 
   Plus, 
   CheckCircle,
-  FileCheck
+  FileCheck,
+  X
 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
@@ -22,6 +23,9 @@ const Dashboard: React.FC = () => {
   const [assetCount, setAssetCount] = useState(0);
   const [slideCount, setSlideCount] = useState(0);
   const [loadingStats, setLoadingStats] = useState(true);
+
+  // Success Notification
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Modals
   const [showAssetModal, setShowAssetModal] = useState(false);
@@ -44,22 +48,23 @@ const Dashboard: React.FC = () => {
   const [slidesUploading, setSlidesUploading] = useState(false);
   const [slidesError, setSlidesError] = useState('');
 
+  const fetchStats = async () => {
+    try {
+      setLoadingStats(true);
+      const [assetsRes, slidesRes] = await Promise.all([
+        api.get('/workspace/assets'),
+        api.get('/slides')
+      ]);
+      setAssetCount(assetsRes.data.length);
+      setSlideCount(slidesRes.data.length);
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoadingStats(true);
-        const [assetsRes, slidesRes] = await Promise.all([
-          api.get('/workspace/assets'),
-          api.get('/slides')
-        ]);
-        setAssetCount(assetsRes.data.length);
-        setSlideCount(slidesRes.data.length);
-      } catch (error) {
-        console.error('Error loading stats:', error);
-      } finally {
-        setLoadingStats(false);
-      }
-    };
     fetchStats();
   }, []);
 
@@ -77,6 +82,7 @@ const Dashboard: React.FC = () => {
 
     setAssetUploading(true);
     setAssetError('');
+    setSuccessMessage('');
 
     const formData = new FormData();
     formData.append('title', assetTitle);
@@ -90,11 +96,13 @@ const Dashboard: React.FC = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setShowAssetModal(false);
+      setSuccessMessage(`Success! Asset "${assetTitle}" uploaded successfully.`);
       // Reset form
       setAssetTitle('');
       setAssetPdfFile(null);
       setAssetFile(null);
-      navigate('/workspace');
+      // Refresh stats
+      fetchStats();
     } catch (error: any) {
       console.error('Error uploading asset:', error);
       setAssetError(error.response?.data?.detail || 'Failed to upload asset. Please try again.');
@@ -121,6 +129,7 @@ const Dashboard: React.FC = () => {
 
     setSlidesUploading(true);
     setSlidesError('');
+    setSuccessMessage('');
 
     const formData = new FormData();
     formData.append('title', slidesTitle);
@@ -133,12 +142,14 @@ const Dashboard: React.FC = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setShowSlidesModal(false);
+      setSuccessMessage(`Success! Slide presentation "${slidesTitle}" uploaded successfully.`);
       // Reset form
       setSlidesTitle('');
       setClientSlideFile(null);
       setProductionSlideFile(null);
       setRecreatedSlideFile(null);
-      navigate('/review-slides');
+      // Refresh stats
+      fetchStats();
     } catch (error: any) {
       console.error('Error uploading slides:', error);
       setSlidesError(error.response?.data?.detail || 'Failed to upload slides. Please try again.');
@@ -178,7 +189,7 @@ const Dashboard: React.FC = () => {
           
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-1.5 text-xs text-text-muted hover:text-[#0B3C88] transition-colors py-1.5 px-3 rounded-xl hover:bg-white border border-transparent hover:border-border shadow-xs hover:shadow-sm"
+            className="flex items-center gap-1.5 text-xs text-text-muted hover:text-[#0B3C88] transition-colors py-1.5 px-3 rounded-xl hover:bg-white border border-transparent hover:border-border shadow-xs hover:shadow-sm cursor-pointer"
           >
             <LogOut size={14} /> Logout
           </button>
@@ -187,6 +198,23 @@ const Dashboard: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="relative z-10 max-w-7xl mx-auto w-full px-6 py-12 flex-1 flex flex-col justify-center">
+        
+        {/* Success Alert Banner */}
+        {successMessage && (
+          <div className="max-w-3xl mx-auto w-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 px-5 py-4 rounded-2xl mb-8 flex justify-between items-center shadow-md animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center gap-3">
+              <CheckCircle size={20} className="text-emerald-600 shrink-0" />
+              <span className="text-sm font-semibold">{successMessage}</span>
+            </div>
+            <button 
+              onClick={() => setSuccessMessage('')} 
+              className="text-emerald-700 hover:text-emerald-900 transition-colors p-1 rounded-lg hover:bg-emerald-500/10 cursor-pointer"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+
         {/* Welcome Section */}
         <div className="mb-14 text-center max-w-3xl mx-auto">
           <h2 className="text-4xl font-extrabold tracking-tight text-[#0B3C88] mb-4 sm:text-5xl leading-tight">
@@ -228,7 +256,7 @@ const Dashboard: React.FC = () => {
               )}
               <button
                 onClick={() => navigate('/workspace')}
-                className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#0B3C88] font-bold py-3.5 px-4 rounded-xl border border-border hover:border-slate-300 transition-all duration-200 shadow-sm"
+                className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#0B3C88] font-bold py-3.5 px-4 rounded-xl border border-border hover:border-slate-300 transition-all duration-200 shadow-sm cursor-pointer"
               >
                 <Search size={16} /> Review Asset
               </button>
@@ -272,7 +300,7 @@ const Dashboard: React.FC = () => {
               )}
               <button
                 onClick={() => navigate('/review-slides')}
-                className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#0B3C88] font-bold py-3.5 px-4 rounded-xl border border-border hover:border-slate-300 transition-all duration-200 shadow-sm"
+                className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#0B3C88] font-bold py-3.5 px-4 rounded-xl border border-border hover:border-slate-300 transition-all duration-200 shadow-sm cursor-pointer"
               >
                 <Search size={16} /> Review Slides
               </button>
@@ -360,14 +388,14 @@ const Dashboard: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => { setShowAssetModal(false); setAssetError(''); }}
-                  className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-text-muted font-bold transition-all text-sm"
+                  className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-text-muted font-bold transition-all text-sm cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={assetUploading}
-                  className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-[#0B3C88] to-primary text-white font-bold shadow-md hover:shadow-lg transition-all text-sm"
+                  className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-[#0B3C88] to-primary text-white font-bold shadow-md hover:shadow-lg transition-all text-sm cursor-pointer"
                 >
                   {assetUploading ? 'Uploading...' : 'Submit Asset'}
                 </button>
@@ -428,14 +456,14 @@ const Dashboard: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => { setShowSlidesModal(false); setSlidesError(''); }}
-                  className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-text-muted font-bold transition-all text-sm"
+                  className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-text-muted font-bold transition-all text-sm cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={slidesUploading}
-                  className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary text-white font-bold shadow-md hover:shadow-lg transition-all text-sm"
+                  className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary text-white font-bold shadow-md hover:shadow-lg transition-all text-sm cursor-pointer"
                 >
                   {slidesUploading ? 'Uploading...' : 'Submit Slides'}
                 </button>
