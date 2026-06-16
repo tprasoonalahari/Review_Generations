@@ -7,12 +7,9 @@ import shutil
 import os
 from uuid import uuid4, UUID
 from app.core.config import settings
-from google.cloud import storage
+from app.core.storage import save_uploaded_file
 
 router = APIRouter(prefix="/workspace", tags=["workspace"])
-
-if settings.GOOGLE_APPLICATION_CREDENTIALS:
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = settings.GOOGLE_APPLICATION_CREDENTIALS
 
 @router.get("/assets")
 def get_assets(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
@@ -47,22 +44,9 @@ def create_asset(
     if current_user.role not in ['admin', 'creator']:
         raise HTTPException(status_code=403, detail="Not authorized to create assets")
     
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(settings.GOOGLE_CLOUD_BUCKET)
-    
-    # Save PDF to GCS
-    pdf_filename = f"uploads/{uuid4()}_{pdf_file.filename}"
-    pdf_blob = bucket.blob(pdf_filename)
-    pdf_blob.upload_from_file(pdf_file.file, content_type=pdf_file.content_type)
-        
-    # Save Asset File to GCS
-    asset_filename = f"uploads/{uuid4()}_{asset_file.filename}"
-    asset_blob = bucket.blob(asset_filename)
-    asset_blob.upload_from_file(asset_file.file, content_type=asset_file.content_type)
-        
-    # Create DB records with GCS URLs
-    pdf_url = f"https://storage.googleapis.com/{settings.GOOGLE_CLOUD_BUCKET}/{pdf_filename}"
-    generation_url = f"https://storage.googleapis.com/{settings.GOOGLE_CLOUD_BUCKET}/{asset_filename}"
+    # Save PDF & Asset using storage utility helper
+    pdf_url = save_uploaded_file(pdf_file)
+    generation_url = save_uploaded_file(asset_file)
     
     new_pub = models.Publication(
         title=title,

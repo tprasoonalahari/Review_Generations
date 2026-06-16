@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
-import { Plus, Search, LogOut, Trash2 } from 'lucide-react';
+import { Plus, Search, LogOut, Trash2, ArrowLeft } from 'lucide-react';
 
 interface Asset {
   publication_id: string;
@@ -94,7 +94,16 @@ const Workspace: React.FC = () => {
     <div className="min-h-screen bg-background text-text p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#0B3C88] to-[#00B5FF] tracking-tight">Review Hub - Orakris</h1>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => navigate('/dashboard')} 
+              className="p-2.5 bg-white border border-border hover:bg-slate-50 text-text-muted hover:text-text rounded-xl shadow-sm transition-all"
+              title="Back to Dashboard"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#0B3C88] to-[#00B5FF] tracking-tight">Review Hub - Orakris</h1>
+          </div>
           <div className="flex gap-4">
             {(user?.role === 'admin' || user?.role === 'creator') && (
               <button 

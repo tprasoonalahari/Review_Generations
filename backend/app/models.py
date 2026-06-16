@@ -67,3 +67,27 @@ class Comment(Base):
     generation = relationship("Generation", back_populates="comments")
     user = relationship("User", back_populates="comments")
     replies = relationship("Comment", backref=backref('parent', remote_side=[id]), cascade="all, delete-orphan")
+
+class SlideSubmission(Base):
+    __tablename__ = "slide_submissions"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    title = Column(String(255), nullable=False)
+    client_slide_url = Column(Text, nullable=False)
+    production_slide_url = Column(Text, nullable=False)
+    recreated_slide_url = Column(Text, nullable=False)
+    uploaded_by = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
+    created_at = Column(DateTime, default=func.now())
+    
+    uploader = relationship("User", backref="slide_submissions")
+    comments = relationship("SlideComment", back_populates="slide_submission", cascade="all, delete-orphan")
+
+class SlideComment(Base):
+    __tablename__ = "slide_comments"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    slide_submission_id = Column(UUID(as_uuid=True), ForeignKey('slide_submissions.id', ondelete='CASCADE'))
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
+    comment_text = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=func.now())
+    
+    slide_submission = relationship("SlideSubmission", back_populates="comments")
+    user = relationship("User", backref="slide_comments")

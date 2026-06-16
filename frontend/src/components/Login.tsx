@@ -41,7 +41,7 @@ const Login: React.FC = () => {
       });
       
       login(response.data.access_token, { email, role: 'viewer' });
-      navigate('/workspace');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Invalid credentials');
     }

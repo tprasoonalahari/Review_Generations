@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.routers import auth, workspace, review
+from app.routers import auth, workspace, review, slides
 from app.database import engine, Base
 from app.core.config import settings
 import os
@@ -44,6 +44,7 @@ app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads"
 app.include_router(auth.router)
 app.include_router(workspace.router)
 app.include_router(review.router)
+app.include_router(slides.router)
 
 @app.get("/")
 def root():

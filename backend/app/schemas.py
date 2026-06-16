@@ -75,3 +75,34 @@ class PublicationResponse(PublicationBase):
     
     class Config:
         from_attributes = True
+
+class SlideCommentBase(BaseModel):
+    comment_text: str
+
+class SlideCommentCreate(SlideCommentBase):
+    pass
+
+class SlideCommentResponse(SlideCommentBase):
+    id: UUID
+    slide_submission_id: UUID
+    user_id: Optional[UUID]
+    created_at: datetime
+    user: Optional[UserResponse] = None
+    
+    class Config:
+        from_attributes = True
+
+class SlideSubmissionBase(BaseModel):
+    title: str
+    client_slide_url: str
+    production_slide_url: str
+    recreated_slide_url: str
+
+class SlideSubmissionResponse(SlideSubmissionBase):
+    id: UUID
+    uploaded_by: Optional[UUID]
+    created_at: datetime
+    comments: List[SlideCommentResponse] = []
+    
+    class Config:
+        from_attributes = True
