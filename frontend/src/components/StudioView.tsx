@@ -249,9 +249,9 @@ const StudioView: React.FC = () => {
 
       {/* Main Grid Grid */}
       <div className="flex-1 min-h-0 grid grid-cols-12 gap-6 p-6 bg-background overflow-hidden">
-        {/* Left Panel - PDF Viewer (Col span 5) */}
+        {/* Left Panel - PDF Viewer (Col span 3) */}
         {isPdfOpen && (
-          <div className="col-span-5 flex flex-col h-full min-h-0 overflow-hidden">
+          <div className="col-span-3 flex flex-col h-full min-h-0 overflow-hidden">
             <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted flex justify-between items-center">
               <span>Source Reference (PDF)</span>
               <button onClick={() => setIsPdfOpen(false)} className="text-text-muted hover:text-text transition-colors" title="Close PDF Panel">
@@ -260,7 +260,7 @@ const StudioView: React.FC = () => {
             </div>
             <div className="flex-1 bg-surface rounded-md shadow-xl border border-border overflow-hidden relative">
               <iframe 
-                src={getFullUrl(data.publication.pdf_url)} 
+                src={`${getFullUrl(data.publication.pdf_url)}#navpanes=0`} 
                 className="absolute inset-0 w-full h-full border-0"
                 title="PDF Viewer"
               />
@@ -269,7 +269,7 @@ const StudioView: React.FC = () => {
         )}
 
         {/* Middle Panel - Asset Viewer */}
-        <div className={`${isPdfOpen ? 'col-span-4' : 'col-span-9'} flex flex-col h-full min-h-0 overflow-hidden`}>
+        <div className={`${isPdfOpen ? 'col-span-6' : 'col-span-9'} flex flex-col h-full min-h-0 overflow-hidden`}>
           <div className="mb-3 text-xs font-bold tracking-widest uppercase text-text-muted flex justify-between items-center">
             <span>Generated Asset</span>
           </div>
