@@ -11,7 +11,7 @@ router = APIRouter(prefix="/slides", tags=["slides"])
 @router.get("")
 def get_slide_submissions(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     # Returns all slide submissions with uploader info
-    submissions = db.query(models.SlideSubmission).options(
+    submissions = db.query(models.SlideSubmission).filter(models.SlideSubmission.uploaded_by == current_user.id).options(
         joinedload(models.SlideSubmission.uploader)
     ).order_by(models.SlideSubmission.created_at.desc()).all()
     
@@ -154,7 +154,7 @@ def delete_slide_comment(
     comment = db.query(models.SlideComment).filter(models.SlideComment.id == comment_id).first()
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
-    if comment.user_id != current_user.id and current_user.role != 'admin':
+    if comment.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="You do not have permission to delete this comment")
         
     db.delete(comment)
@@ -167,12 +167,11 @@ def delete_slide_submission(
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    if current_user.role not in ['admin', 'creator']:
-        raise HTTPException(status_code=403, detail="Not authorized to delete submissions")
-        
     submission = db.query(models.SlideSubmission).filter(models.SlideSubmission.id == submission_id).first()
     if not submission:
         raise HTTPException(status_code=404, detail="Slide submission not found")
+    if submission.uploaded_by != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this submission")
         
     db.delete(submission)
     db.commit()

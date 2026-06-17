@@ -19,6 +19,7 @@ class AssetType(str, enum.Enum):
     PPT = 'PPT'
     Poster = 'Poster'
     Infographic = 'Infographic'
+    Audio = 'Audio'
 
 class User(Base):
     __tablename__ = "users"

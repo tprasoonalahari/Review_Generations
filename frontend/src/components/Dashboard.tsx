@@ -12,7 +12,12 @@ import {
   Plus, 
   CheckCircle,
   FileCheck,
-  X
+  X,
+  Video,
+  FileSpreadsheet,
+  Image,
+  Volume2,
+  PieChart
 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
@@ -25,14 +30,6 @@ const Dashboard: React.FC = () => {
   const [slideCount, setSlideCount] = useState(0);
   const [loadingStats, setLoadingStats] = useState(true);
 
-  useEffect(() => {
-    if (location.state && (location.state as any).openUploadAsset) {
-      setShowAssetModal(true);
-      // Clear location state
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location.state, navigate]);
-
   // Success Notification
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -43,9 +40,15 @@ const Dashboard: React.FC = () => {
   // Asset Form States
   const [assetTitle, setAssetTitle] = useState('');
   const [assetAudience, setAssetAudience] = useState('Doctor');
-  const [assetType, setAssetType] = useState('Video');
   const [assetPdfFile, setAssetPdfFile] = useState<File | null>(null);
-  const [assetFile, setAssetFile] = useState<File | null>(null);
+  
+  // Individual optional asset files
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [pptFile, setPptFile] = useState<File | null>(null);
+  const [posterFile, setPosterFile] = useState<File | null>(null);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [infographicFile, setInfographicFile] = useState<File | null>(null);
+
   const [assetUploading, setAssetUploading] = useState(false);
   const [assetError, setAssetError] = useState('');
 
@@ -77,6 +80,14 @@ const Dashboard: React.FC = () => {
     fetchStats();
   }, []);
 
+  useEffect(() => {
+    if (location.state && (location.state as any).openUploadAsset) {
+      setShowAssetModal(true);
+      // Clear location state
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, navigate]);
+
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to log out?')) {
       logout();
@@ -86,8 +97,13 @@ const Dashboard: React.FC = () => {
 
   const handleAssetSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!assetPdfFile || !assetFile) {
-      setAssetError('Please select both a publication PDF and an asset file.');
+    if (!assetPdfFile) {
+      setAssetError('Please select a source publication PDF.');
+      return;
+    }
+
+    if (!videoFile && !pptFile && !posterFile && !audioFile && !infographicFile) {
+      setAssetError('Please upload at least one generated asset (Video, PPT, Poster, Audio Summary, or Infographic).');
       return;
     }
 
@@ -98,25 +114,33 @@ const Dashboard: React.FC = () => {
     const formData = new FormData();
     formData.append('title', assetTitle);
     formData.append('audience_level', assetAudience);
-    formData.append('asset_type', assetType);
     formData.append('pdf_file', assetPdfFile);
-    formData.append('asset_file', assetFile);
+    
+    if (videoFile) formData.append('video_file', videoFile);
+    if (pptFile) formData.append('ppt_file', pptFile);
+    if (posterFile) formData.append('poster_file', posterFile);
+    if (audioFile) formData.append('audio_file', audioFile);
+    if (infographicFile) formData.append('infographic_file', infographicFile);
 
     try {
       await api.post('/workspace/assets', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setShowAssetModal(false);
-      setSuccessMessage(`Success! Asset "${assetTitle}" uploaded successfully.`);
+      setSuccessMessage(`Success! Multimodal assets for "${assetTitle}" uploaded successfully.`);
       // Reset form
       setAssetTitle('');
       setAssetPdfFile(null);
-      setAssetFile(null);
+      setVideoFile(null);
+      setPptFile(null);
+      setPosterFile(null);
+      setAudioFile(null);
+      setInfographicFile(null);
       // Refresh stats
       fetchStats();
     } catch (error: any) {
       console.error('Error uploading asset:', error);
-      setAssetError(error.response?.data?.detail || 'Failed to upload asset. Please try again.');
+      setAssetError(error.response?.data?.detail || 'Failed to upload assets. Please try again.');
     } finally {
       setAssetUploading(false);
     }
@@ -170,7 +194,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-text flex flex-col font-sans relative">
+    <div className="min-h-screen bg-background text-text flex flex-col font-sans relative animate-fade-in">
       {/* Dynamic background decoration in brand color */}
       <div className="absolute top-0 left-0 w-full h-[320px] bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
       <div className="absolute top-[10%] right-[5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
@@ -194,7 +218,7 @@ const Dashboard: React.FC = () => {
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
             <span className="font-semibold text-text">{user?.email}</span>
             <span className="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 bg-[#0B3C88]/10 text-[#0B3C88] rounded-full border border-[#0B3C88]/10">
-              {user?.role}
+              Active
             </span>
           </div>
           
@@ -257,14 +281,12 @@ const Dashboard: React.FC = () => {
             </p>
 
             <div className="flex gap-4">
-              {(user?.role === 'admin' || user?.role === 'creator') && (
-                <button
-                  onClick={() => setShowAssetModal(true)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#0B3C88] to-primary hover:from-[#072758] hover:to-primary text-white font-bold py-3.5 px-4 rounded-xl shadow-md shadow-blue-950/10 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
-                >
-                  <Upload size={16} /> Upload Asset
-                </button>
-              )}
+              <button
+                onClick={() => setShowAssetModal(true)}
+                className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#0B3C88] to-primary hover:from-[#072758] hover:to-primary text-white font-bold py-3.5 px-4 rounded-xl shadow-md shadow-blue-950/10 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+              >
+                <Upload size={16} /> Upload Asset
+              </button>
               <button
                 onClick={() => navigate('/workspace')}
                 className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#0B3C88] font-bold py-3.5 px-4 rounded-xl border border-border hover:border-slate-300 transition-all duration-200 shadow-sm cursor-pointer"
@@ -301,14 +323,12 @@ const Dashboard: React.FC = () => {
             </p>
 
             <div className="flex gap-4">
-              {(user?.role === 'admin' || user?.role === 'creator') && (
-                <button
-                  onClick={() => setShowSlidesModal(true)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary text-white font-bold py-3.5 px-4 rounded-xl shadow-md shadow-blue-500/10 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
-                >
-                  <Plus size={16} /> Upload Slides
-                </button>
-              )}
+              <button
+                onClick={() => setShowSlidesModal(true)}
+                className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary text-white font-bold py-3.5 px-4 rounded-xl shadow-md shadow-blue-500/10 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+              >
+                <Plus size={16} /> Upload Slides
+              </button>
               <button
                 onClick={() => navigate('/review-slides')}
                 className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#0B3C88] font-bold py-3.5 px-4 rounded-xl border border-border hover:border-slate-300 transition-all duration-200 shadow-sm cursor-pointer"
@@ -331,9 +351,17 @@ const Dashboard: React.FC = () => {
       {/* Asset Upload Modal */}
       {showAssetModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-surface border border-border rounded-3xl w-full max-w-lg p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
-            <h3 className="text-2xl font-bold text-[#0B3C88] mb-2">Upload Multimodal Asset</h3>
-            <p className="text-text-muted text-xs mb-6">Create a database record mapping the publication reference to its asset.</p>
+          <div className="bg-surface border border-border rounded-3xl w-full max-w-2xl p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-2xl font-bold text-[#0B3C88]">Upload Multimodal Assets</h3>
+              <button 
+                onClick={() => { setShowAssetModal(false); setAssetError(''); }}
+                className="text-slate-400 hover:text-slate-600 transition-colors p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <p className="text-text-muted text-xs mb-6">Create a database record mapping the publication reference to its generated multimodal asset files.</p>
 
             {assetError && (
               <div className="bg-red-500/10 border border-red-500/30 text-red-500 p-3 rounded-lg mb-4 text-xs font-semibold">
@@ -341,74 +369,124 @@ const Dashboard: React.FC = () => {
               </div>
             )}
 
-            <form onSubmit={handleAssetSubmit} className="space-y-5">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Publication Title</label>
-                <input 
-                  type="text" required value={assetTitle} onChange={e => setAssetTitle(e.target.value)}
-                  className="w-full bg-white border border-border rounded-xl px-4 py-3 text-text placeholder-slate-400 focus:outline-none focus:border-primary text-sm shadow-xs"
-                  placeholder="e.g. Clinical Trial Evaluation"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Audience Level</label>
-                  <select 
-                    value={assetAudience} onChange={e => setAssetAudience(e.target.value)}
-                    className="w-full bg-white border border-border rounded-xl px-4 py-3 text-text focus:outline-none focus:border-primary text-sm shadow-xs"
-                  >
-                    <option value="Field force">Field force</option>
-                    <option value="MSLs">MSLs</option>
-                    <option value="Doctor">Doctor</option>
-                    <option value="HCP">HCP</option>
-                    <option value="Patient">Patient</option>
-                  </select>
+            <form onSubmit={handleAssetSubmit} className="space-y-6">
+              {/* Publication Info Section */}
+              <div className="bg-slate-50 p-5 rounded-2xl border border-border space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#0B3C88] mb-1">1. Publication Reference</h4>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-text-muted mb-1">Publication Title</label>
+                    <input 
+                      type="text" required value={assetTitle} onChange={e => setAssetTitle(e.target.value)}
+                      className="w-full bg-white border border-border rounded-xl px-4 py-2.5 text-text placeholder-slate-400 focus:outline-none focus:border-primary text-sm shadow-xs"
+                      placeholder="e.g. Zinc Obesity Clinical Trial"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-text-muted mb-1">Target Audience</label>
+                    <select 
+                      value={assetAudience} onChange={e => setAssetAudience(e.target.value)}
+                      className="w-full bg-white border border-border rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary text-sm shadow-xs"
+                    >
+                      <option value="Field force">Field force</option>
+                      <option value="MSLs">MSLs</option>
+                      <option value="Doctor">Doctor</option>
+                      <option value="HCP">HCP</option>
+                      <option value="Patient">Patient</option>
+                      <option value="Professional">Professional</option>
+                      <option value="Scientist">Scientist</option>
+                    </select>
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Asset Type</label>
-                  <select 
-                    value={assetType} onChange={e => setAssetType(e.target.value)}
-                    className="w-full bg-white border border-border rounded-xl px-4 py-3 text-text focus:outline-none focus:border-primary text-sm shadow-xs"
-                  >
-                    <option value="Video">Video</option>
-                    <option value="PPT">PPT</option>
-                    <option value="Poster">Poster</option>
-                    <option value="Infographic">Infographic</option>
-                  </select>
+                  <label className="block text-xs font-semibold text-text-muted mb-1">Source Publication (PDF)</label>
+                  <input 
+                    type="file" accept=".pdf" required onChange={e => setAssetPdfFile(e.target.files?.[0] || null)}
+                    className="w-full bg-white border border-border rounded-xl px-4 py-2 text-text text-xs file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer shadow-xs"
+                  />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Source Publication (PDF)</label>
-                <input 
-                  type="file" accept=".pdf" required onChange={e => setAssetPdfFile(e.target.files?.[0] || null)}
-                  className="w-full bg-white border border-border rounded-xl px-4 py-2.5 text-text text-xs file:mr-4 file:py-1 file:px-3.5 file:rounded-lg file:border-0 file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer shadow-xs"
-                />
+              {/* Generated Assets Selection */}
+              <div className="bg-slate-50 p-5 rounded-2xl border border-border space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#0B3C88] mb-1">2. Generated Assets (Select one or more)</h4>
+                
+                {/* Video */}
+                <div className="flex items-center justify-between border-b border-border/60 pb-3.5">
+                  <div className="flex items-center gap-2.5 w-[35%] shrink-0">
+                    <Video size={16} className="text-blue-500" />
+                    <span className="text-xs font-bold text-text">Video Summary</span>
+                  </div>
+                  <input 
+                    type="file" accept="video/*" onChange={e => setVideoFile(e.target.files?.[0] || null)}
+                    className="flex-1 bg-white border border-border rounded-lg px-3 py-1.5 text-text text-xs file:mr-3 file:py-0.5 file:px-2.5 file:rounded file:border-0 file:bg-slate-100 file:text-text hover:file:bg-slate-200 cursor-pointer"
+                  />
+                </div>
+
+                {/* PPT */}
+                <div className="flex items-center justify-between border-b border-border/60 pb-3.5">
+                  <div className="flex items-center gap-2.5 w-[35%] shrink-0">
+                    <FileSpreadsheet size={16} className="text-emerald-500" />
+                    <span className="text-xs font-bold text-text">PowerPoint Slide (PPTX)</span>
+                  </div>
+                  <input 
+                    type="file" accept=".pptx,.ppt" onChange={e => setPptFile(e.target.files?.[0] || null)}
+                    className="flex-1 bg-white border border-border rounded-lg px-3 py-1.5 text-text text-xs file:mr-3 file:py-0.5 file:px-2.5 file:rounded file:border-0 file:bg-slate-100 file:text-text hover:file:bg-slate-200 cursor-pointer"
+                  />
+                </div>
+
+                {/* Poster */}
+                <div className="flex items-center justify-between border-b border-border/60 pb-3.5">
+                  <div className="flex items-center gap-2.5 w-[35%] shrink-0">
+                    <Image size={16} className="text-purple-500" />
+                    <span className="text-xs font-bold text-text">Medical Poster</span>
+                  </div>
+                  <input 
+                    type="file" accept="image/*,.pdf" onChange={e => setPosterFile(e.target.files?.[0] || null)}
+                    className="flex-1 bg-white border border-border rounded-lg px-3 py-1.5 text-text text-xs file:mr-3 file:py-0.5 file:px-2.5 file:rounded file:border-0 file:bg-slate-100 file:text-text hover:file:bg-slate-200 cursor-pointer"
+                  />
+                </div>
+
+                {/* Audio summary */}
+                <div className="flex items-center justify-between border-b border-border/60 pb-3.5">
+                  <div className="flex items-center gap-2.5 w-[35%] shrink-0">
+                    <Volume2 size={16} className="text-amber-500" />
+                    <span className="text-xs font-bold text-text">Audio Summary</span>
+                  </div>
+                  <input 
+                    type="file" accept="audio/*" onChange={e => setAudioFile(e.target.files?.[0] || null)}
+                    className="flex-1 bg-white border border-border rounded-lg px-3 py-1.5 text-text text-xs file:mr-3 file:py-0.5 file:px-2.5 file:rounded file:border-0 file:bg-slate-100 file:text-text hover:file:bg-slate-200 cursor-pointer"
+                  />
+                </div>
+
+                {/* Infographic */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5 w-[35%] shrink-0">
+                    <PieChart size={16} className="text-cyan-500" />
+                    <span className="text-xs font-bold text-text">Infographic Summary</span>
+                  </div>
+                  <input 
+                    type="file" accept="image/*,.pdf" onChange={e => setInfographicFile(e.target.files?.[0] || null)}
+                    className="flex-1 bg-white border border-border rounded-lg px-3 py-1.5 text-text text-xs file:mr-3 file:py-0.5 file:px-2.5 file:rounded file:border-0 file:bg-slate-100 file:text-text hover:file:bg-slate-200 cursor-pointer"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Generated Asset File</label>
-                <input 
-                  type="file" required onChange={e => setAssetFile(e.target.files?.[0] || null)}
-                  className="w-full bg-white border border-border rounded-xl px-4 py-2.5 text-text text-xs file:mr-4 file:py-1 file:px-3.5 file:rounded-lg file:border-0 file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer shadow-xs"
-                />
-              </div>
-
+              {/* Action Buttons */}
               <div className="flex gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => { setShowAssetModal(false); setAssetError(''); }}
-                  className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-text-muted font-bold transition-all text-sm cursor-pointer"
+                  className="flex-1 py-3.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-text-muted font-bold transition-all text-sm cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={assetUploading}
-                  className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-[#0B3C88] to-primary text-white font-bold shadow-md hover:shadow-lg transition-all text-sm cursor-pointer"
+                  className="flex-1 py-3.5 px-4 rounded-xl bg-[#0B3C88] hover:bg-[#072758] text-white font-bold shadow-md hover:shadow-lg transition-all text-sm cursor-pointer"
                 >
-                  {assetUploading ? 'Uploading...' : 'Submit Asset'}
+                  {assetUploading ? 'Uploading Assets...' : 'Submit Records'}
                 </button>
               </div>
             </form>

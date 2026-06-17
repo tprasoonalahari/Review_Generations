@@ -75,7 +75,7 @@ def delete_comment(comment_id: UUID, db: Session = Depends(database.get_db), cur
     comment = db.query(models.Comment).filter(models.Comment.id == comment_id).first()
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
-    if comment.user_id != current_user.id and current_user.role != 'admin':
+    if comment.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="You do not have permission to delete this comment")
     
     db.delete(comment)

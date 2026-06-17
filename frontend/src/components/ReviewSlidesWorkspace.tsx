@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { ArrowLeft, Search, Trash2 } from 'lucide-react';
 
@@ -17,7 +16,7 @@ interface SlideSubmission {
 const ReviewSlidesWorkspace: React.FC = () => {
   const [submissions, setSubmissions] = useState<SlideSubmission[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+
   const navigate = useNavigate();
 
   const fetchSubmissions = async () => {
@@ -123,15 +122,13 @@ const ReviewSlidesWorkspace: React.FC = () => {
                         >
                           <Search size={16} /> Review Slides
                         </button>
-                        {(user?.role === 'admin' || user?.role === 'creator') && (
-                          <button 
-                            onClick={() => handleDelete(sub.id)}
-                            className="inline-flex items-center justify-center bg-white border border-border hover:bg-red-50 text-red-500 hover:text-red-600 px-3 py-2 rounded-lg shadow-sm hover:shadow transition-all duration-200 cursor-pointer"
-                            title="Delete Slide Set"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        )}
+                        <button 
+                          onClick={() => handleDelete(sub.id)}
+                          className="inline-flex items-center justify-center bg-white border border-border hover:bg-red-50 text-red-500 hover:text-red-600 px-3 py-2 rounded-lg shadow-sm hover:shadow transition-all duration-200 cursor-pointer"
+                          title="Delete Slide Set"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </td>
                   </tr>

@@ -260,18 +260,15 @@ const SlideReviewStudio: React.FC = () => {
                         {new Date(comment.created_at).toLocaleDateString()} {new Date(comment.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                       </span>
                       
-                      {/* Edit/Delete controls */}
-                      {(user?.email === comment.user || user?.role === 'admin') && (
+                      {user?.email === comment.user && (
                         <div className="flex items-center gap-1 opacity-0 group-hover/comment:opacity-100 transition-opacity">
-                          {user?.email === comment.user && (
-                            <button
-                              onClick={() => startEditing(comment.id, comment.text)}
-                              className="p-1 hover:bg-slate-100 text-text-muted hover:text-[#0B3C88] rounded transition-colors cursor-pointer"
-                              title="Edit Comment"
-                            >
-                              <Edit2 size={12} />
-                            </button>
-                          )}
+                          <button
+                            onClick={() => startEditing(comment.id, comment.text)}
+                            className="p-1 hover:bg-slate-100 text-text-muted hover:text-[#0B3C88] rounded transition-colors cursor-pointer"
+                            title="Edit Comment"
+                          >
+                            <Edit2 size={12} />
+                          </button>
                           <button
                             onClick={() => handleDeleteComment(comment.id)}
                             className="p-1 hover:bg-red-50 text-text-muted hover:text-red-500 rounded transition-colors cursor-pointer"

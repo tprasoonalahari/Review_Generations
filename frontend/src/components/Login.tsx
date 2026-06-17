@@ -12,7 +12,7 @@ const Login: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [role, setRole] = useState('viewer');
+  const role = 'viewer';
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const { login } = useAuth();
@@ -40,7 +40,8 @@ const Login: React.FC = () => {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       });
       
-      login(response.data.access_token, { email, role: 'viewer' });
+      const payload = JSON.parse(atob(response.data.access_token.split('.')[1]));
+      login(response.data.access_token, { email: payload.sub, role: payload.role });
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Invalid credentials');
@@ -96,13 +97,13 @@ const Login: React.FC = () => {
         {isRegistering ? (
           <form onSubmit={handleRegister}>
             <div className="mb-5">
-              <label className="block text-text-muted text-sm font-semibold mb-2">Email</label>
+              <label className="block text-text-muted text-sm font-semibold mb-2">Email / Username</label>
               <input 
-                type="email" 
+                type="text" 
                 className="w-full px-4 py-3 bg-background/50 text-text border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="e.g. user@pubvision.com"
+                placeholder="e.g. user@pubvision.com or Reviewer"
                 required
               />
             </div>
@@ -146,18 +147,7 @@ const Login: React.FC = () => {
                 </button>
               </div>
             </div>
-            <div className="mb-8">
-              <label className="block text-text-muted text-sm font-semibold mb-2">Role</label>
-              <select 
-                className="w-full px-4 py-3 bg-background/50 text-text border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <option value="viewer">Viewer (Default)</option>
-                <option value="creator">Creator</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
+
             <button type="submit" className="w-full bg-gradient-to-r from-primary to-[#00c6ff] hover:from-primary-hover hover:to-primary text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 cursor-pointer">
               Register
             </button>
@@ -186,13 +176,13 @@ const Login: React.FC = () => {
               />
             </div>
             <div className="mb-5">
-              <label className="block text-text-muted text-sm font-semibold mb-2">Email</label>
+              <label className="block text-text-muted text-sm font-semibold mb-2">Email / Username</label>
               <input 
-                type="email" 
+                type="text" 
                 className="w-full px-4 py-3 bg-background/50 text-text border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="e.g. user@pubvision.com"
+                placeholder="e.g. user@pubvision.com or Reviewer"
                 required
               />
             </div>

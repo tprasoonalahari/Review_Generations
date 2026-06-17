@@ -25,6 +25,7 @@ try:
         conn.execute(text("SET lock_timeout = '2000';")) # Fail-fast after 2 seconds if lock is held
         conn.execute(text("ALTER TYPE audiencelevel ADD VALUE IF NOT EXISTS 'Field force';"))
         conn.execute(text("ALTER TYPE audiencelevel ADD VALUE IF NOT EXISTS 'MSLs';"))
+        conn.execute(text("ALTER TYPE assettype ADD VALUE IF NOT EXISTS 'Audio';"))
 except Exception as e:
     print(f"Enum Migration error (values might exist or lock timeout): {e}")
 

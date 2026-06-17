@@ -26,6 +26,7 @@ try:
     with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
         conn.execute(text("ALTER TYPE audiencelevel ADD VALUE IF NOT EXISTS 'Field force';"))
         conn.execute(text("ALTER TYPE audiencelevel ADD VALUE IF NOT EXISTS 'MSLs';"))
+        conn.execute(text("ALTER TYPE assettype ADD VALUE IF NOT EXISTS 'Audio';"))
         print("Enum values added successfully.")
 except Exception as e:
     print(f"Enum Migration error (might already exist): {e}")

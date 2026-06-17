@@ -298,17 +298,15 @@ const StudioView: React.FC = () => {
                           <span className="font-bold text-primary truncate w-[55%]" title={rootComment.user}>{rootComment.user}</span>
                           <div className="flex items-center gap-1.5 shrink-0">
                             <span className="text-xs text-text-muted font-medium">{new Date(rootComment.created_at).toLocaleDateString()}</span>
-                            {(user?.email === rootComment.user || user?.role === 'admin') && (
+                            {user?.email === rootComment.user && (
                               <div className="flex items-center gap-1 ml-1 opacity-0 group-hover/comment:opacity-100 transition-opacity">
-                                {user?.email === rootComment.user && (
-                                  <button 
-                                    onClick={() => startEditing(rootComment.id, rootComment.text)}
-                                    className="text-text-muted hover:text-primary transition-colors p-0.5 rounded hover:bg-slate-200/50"
-                                    title="Edit Comment"
-                                  >
-                                    <Edit2 size={13} />
-                                  </button>
-                                )}
+                                <button 
+                                  onClick={() => startEditing(rootComment.id, rootComment.text)}
+                                  className="text-text-muted hover:text-primary transition-colors p-0.5 rounded hover:bg-slate-200/50"
+                                  title="Edit Comment"
+                                >
+                                  <Edit2 size={13} />
+                                </button>
                                 <button 
                                   onClick={() => handleDeleteComment(rootComment.id)}
                                   className="text-text-muted hover:text-red-500 transition-colors p-0.5 rounded hover:bg-slate-200/50"
@@ -371,17 +369,15 @@ const StudioView: React.FC = () => {
                                 <span className="font-bold text-text-muted text-xs truncate w-[50%]" title={reply.user}>{reply.user}</span>
                                 <div className="flex items-center gap-1.5 shrink-0">
                                   <span className="text-[10px] text-text-muted/70">{new Date(reply.created_at).toLocaleDateString()}</span>
-                                  {(user?.email === reply.user || user?.role === 'admin') && (
+                                  {user?.email === reply.user && (
                                     <div className="flex items-center gap-0.5 ml-1 opacity-0 group-hover/reply:opacity-100 transition-opacity">
-                                      {user?.email === reply.user && (
-                                        <button 
-                                          onClick={() => startEditing(reply.id, reply.text)}
-                                          className="text-text-muted hover:text-primary transition-colors p-0.5 rounded hover:bg-slate-100"
-                                          title="Edit Reply"
-                                        >
-                                          <Edit2 size={11} />
-                                        </button>
-                                      )}
+                                      <button 
+                                        onClick={() => startEditing(reply.id, reply.text)}
+                                        className="text-text-muted hover:text-primary transition-colors p-0.5 rounded hover:bg-slate-100"
+                                        title="Edit Reply"
+                                      >
+                                        <Edit2 size={11} />
+                                      </button>
                                       <button 
                                         onClick={() => handleDeleteComment(reply.id)}
                                         className="text-text-muted hover:text-red-500 transition-colors p-0.5 rounded hover:bg-slate-100"
