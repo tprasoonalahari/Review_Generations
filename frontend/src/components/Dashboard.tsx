@@ -442,7 +442,7 @@ const Dashboard: React.FC = () => {
                     <span className="text-xs font-bold text-text">Medical Poster</span>
                   </div>
                   <input 
-                    type="file" accept="image/*,.pdf" onChange={e => setPosterFile(e.target.files?.[0] || null)}
+                    type="file" accept="image/*,.pdf,.pptx,.ppt" onChange={e => setPosterFile(e.target.files?.[0] || null)}
                     className="flex-1 bg-white border border-border rounded-lg px-3 py-1.5 text-text text-xs file:mr-3 file:py-0.5 file:px-2.5 file:rounded file:border-0 file:bg-slate-100 file:text-text hover:file:bg-slate-200 cursor-pointer"
                   />
                 </div>
@@ -466,7 +466,7 @@ const Dashboard: React.FC = () => {
                     <span className="text-xs font-bold text-text">Infographic Summary</span>
                   </div>
                   <input 
-                    type="file" accept="image/*,.pdf" onChange={e => setInfographicFile(e.target.files?.[0] || null)}
+                    type="file" accept=".pptx,.ppt,image/*,.pdf" onChange={e => setInfographicFile(e.target.files?.[0] || null)}
                     className="flex-1 bg-white border border-border rounded-lg px-3 py-1.5 text-text text-xs file:mr-3 file:py-0.5 file:px-2.5 file:rounded file:border-0 file:bg-slate-100 file:text-text hover:file:bg-slate-200 cursor-pointer"
                   />
                 </div>

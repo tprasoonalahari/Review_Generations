@@ -14,7 +14,11 @@ router = APIRouter(prefix="/workspace", tags=["workspace"])
 @router.get("/assets")
 def get_assets(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     # Returns combined data: Publications and their Generations
-    publications = db.query(models.Publication).filter(models.Publication.uploaded_by == current_user.id).options(joinedload(models.Publication.generations)).all()
+    publications = db.query(models.Publication)\
+        .filter(models.Publication.uploaded_by == current_user.id)\
+        .options(joinedload(models.Publication.generations))\
+        .order_by(models.Publication.created_at.desc())\
+        .all()
     result = []
     for pub in publications:
         for gen in pub.generations:
