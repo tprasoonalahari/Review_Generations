@@ -20,6 +20,38 @@ try:
 except Exception as e:
     print(f"Migration error (column might exist or lock timeout): {e}")
 
+# Auto-seed default users
+try:
+    from app.database import SessionLocal
+    from app.models import User
+    from app.core import security
+
+    db_session = SessionLocal()
+    
+    # 1. Admin
+    admin_email = "admin@pubvision.com"
+    admin_user = db_session.query(User).filter(User.email == admin_email).first()
+    if not admin_user:
+        print("Auto-seeding default admin user...")
+        hashed_password = security.get_password_hash("admin123")
+        new_admin = User(email=admin_email, password_hash=hashed_password, role="admin")
+        db_session.add(new_admin)
+        db_session.commit()
+
+    # 2. Reviewer
+    reviewer_email = "Reviewer"
+    reviewer_user = db_session.query(User).filter(User.email == reviewer_email).first()
+    if not reviewer_user:
+        print("Auto-seeding default reviewer user...")
+        hashed_password = security.get_password_hash("Reviewer123")
+        new_reviewer = User(email=reviewer_email, password_hash=hashed_password, role="creator")
+        db_session.add(new_reviewer)
+        db_session.commit()
+
+    db_session.close()
+except Exception as e:
+    print(f"Auto-seeding error: {e}")
+
 try:
     with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
         conn.execute(text("SET lock_timeout = '2000';")) # Fail-fast after 2 seconds if lock is held
